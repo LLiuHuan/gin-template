@@ -1,0 +1,46 @@
+[project]
+  domain = "127.0.0.1"
+  port = 8087
+[database]
+  mode = "mysql"
+  [database.mysql]
+    isOpenReadDB = 1
+    [database.mysql.base]
+      connMaxLifeTime = 60
+      maxIdleConn = 60
+      maxOpenConn = 1
+    [database.mysql.read]
+      host = "127.0.0.1"
+      port = 3306
+      dataBase = "gin_template"
+      pass = "root"
+      user = "root"
+    [database.mysql.write]
+      host = "127.0.0.1"
+      port = 3306
+      dataBase = "gin_template1"
+      pass = "root"
+      user = "root"
+  [database.postgresql]
+    isOpenReadDB = 1
+    [database.postgresql.base]
+      connMaxLifeTime = 60
+      maxIdleConn = 60
+      maxOpenConn = 1
+    [database.postgresql.read]
+      host = "127.0.0.1"
+      port = 5432
+      dataBase = "postgres"
+      pass = "qwer1234"
+      user = "postgres"
+    [database.postgresql.write]
+      host = "127.0.0.1"
+      port = 5432
+      dataBase = "postgres"
+      pass = "qwer1234"
+      user = "postgres"
+
+[redis]
+  mode = "simple"
+  addr = "127.0.0.1:6379"
+  db = 1

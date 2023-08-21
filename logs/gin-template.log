@@ -1,0 +1,3 @@
+{"level":"\u001b[31mfatal\u001b[0m","time":"2023-08-21 15:15:44","caller":"gin-template/main.go:77","msg":"http server startup err","domain":"gin-template[dev]","error":"listen tcp 127.0.0.1:8082: bind: address already in use"}
+{"level":"\u001b[31mfatal\u001b[0m","time":"2023-08-21 15:16:54","caller":"gin-template/main.go:77","msg":"http server startup err","domain":"gin-template[dev]","error":"listen tcp 127.0.0.1:8082: bind: address already in use"}
+{"level":"\u001b[31mfatal\u001b[0m","time":"2023-08-21 15:17:08","caller":"gin-template/main.go:77","msg":"http server startup err","domain":"gin-template[dev]","error":"listen tcp 127.0.0.1:8087: bind: address already in use"}
