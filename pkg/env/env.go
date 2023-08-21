@@ -5,7 +5,9 @@
 package env
 
 import (
+	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,22 +41,21 @@ func (e *environment) IsPro() bool {
 }
 
 func init() {
-	//env := flag.String("env", "", "请输入运行环境:\n dev:开发环境\n pro:正式环境\n")
-	//flag.Parse()
-	//
-	//switch strings.ToLower(strings.TrimSpace(*env)) {
-	//case "dev":
-	//	active = dev
-	//	gin.SetMode(gin.DebugMode)
-	//case "pro":
-	//	gin.SetMode(gin.ReleaseMode)
-	//	active = pro
-	//default:
-	active = dev
-	gin.SetMode(gin.DebugMode)
-	fmt.Println(dev)
-	//fmt.Println("Warning: '-env' cannot be found, or it is illegal. The default 'dev' will be used.")
-	//}
+	env := flag.String("env", "", "请输入运行环境:\n dev:开发环境\n pro:正式环境\n")
+	flag.Parse()
+
+	switch strings.ToLower(strings.TrimSpace(*env)) {
+	case "dev":
+		active = dev
+		gin.SetMode(gin.DebugMode)
+	case "pro":
+		gin.SetMode(gin.ReleaseMode)
+		active = pro
+	default:
+		active = dev
+		gin.SetMode(gin.DebugMode)
+		fmt.Println("Warning: '-env' cannot be found, or it is illegal. The default 'dev' will be used.")
+	}
 }
 
 func Active() Environment {
