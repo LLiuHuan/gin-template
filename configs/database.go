@@ -24,7 +24,7 @@ type DataBaseConf struct {
 
 type DataBaseConfDetail struct {
 	Host     string `toml:"host"`
-	Port     string `toml:"port"`
+	Port     int    `toml:"port"`
 	User     string `toml:"user"`
 	Pass     string `toml:"pass"`
 	DataBase string `toml:"dataBase"`

@@ -6,25 +6,23 @@ package router
 
 import (
 	"errors"
-	"fmt"
-	"github.com/LLiuHuan/gin-template/internal/repository/cron"
-
-	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/alert"
 	"github.com/LLiuHuan/gin-template/internal/metrics"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
+	"github.com/LLiuHuan/gin-template/internal/repository/cron"
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
+	"github.com/LLiuHuan/gin-template/internal/router/interceptor"
 	"go.uber.org/zap"
 )
 
 type resource struct {
-	mux    core.Mux
-	logger *zap.Logger
-	db     database.Repo
-	cache  redis.Repo
-	//interceptors interceptor.Interceptor
-	cronServer cron.Server
+	mux          core.Mux
+	logger       *zap.Logger
+	db           database.Repo
+	cache        redis.Repo
+	interceptors interceptor.Interceptor
+	cronServer   cron.Server
 }
 
 type Server struct {
@@ -42,7 +40,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	r := new(resource)
 	r.logger = logger
 
-	openBrowserUri := fmt.Sprintf("http://%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port)
+	//openBrowserUri := fmt.Sprintf("http://%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port)
 
 	// TODO: 后续判断一下是否安装，如果没安装可以提示让跳转到初始化页面
 	//_, ok := file.IsExists(configs.ProjectInstallMark)
@@ -73,7 +71,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	//}
 
 	mux, err := core.NewRouter(logger,
-		core.WithEnableOpenBrowser(openBrowserUri),
+		//core.WithEnableOpenBrowser(openBrowserUri),
 		core.WithEnableCors(),
 		core.WithEnableRate(),
 		core.WithAlertNotify(alert.NotifyHandler(logger)),
@@ -86,7 +84,9 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 
 	r.mux = mux
 	// 拦截器
-	//r.interceptors = interceptor.New(logger, r.cache, r.db)
+	r.interceptors = interceptor.New(logger, r.cache, r.db)
+
+	setRenderRouter(r)
 
 	s := new(Server)
 	s.Mux = mux

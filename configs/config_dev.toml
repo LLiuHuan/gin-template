@@ -18,7 +18,7 @@
     [database.mysql.write]
       host = "127.0.0.1"
       port = 3306
-      dataBase = "gin_template1"
+      dataBase = "gin_template"
       pass = "root"
       user = "root"
   [database.postgresql]

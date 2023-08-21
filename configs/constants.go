@@ -8,6 +8,7 @@ package configs
 import (
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/LLiuHuan/gin-template/pkg/errors"
 )
@@ -52,6 +53,21 @@ const (
 	ProjectDBPGSQL     = "postgresql"
 
 	ConfigKeyPrefix = "Config_" //  配置文件键值缓存时，键的前缀
+
+	// RedisKeyPrefixLoginUser Redis Key 前缀 - 登录用户信息
+	RedisKeyPrefixLoginUser = ProjectName + ":login-user:"
+
+	// RedisKeyPrefixSignature Redis Key 前缀 - 签名验证信息
+	RedisKeyPrefixSignature = ProjectName + ":signature:"
+
+	// LoginSessionTTL 登录有效期为 24 小时
+	LoginSessionTTL = time.Hour * 24
+
+	// ProjectInstallMark 项目安装完成标识
+	ProjectInstallMark = "INSTALL.lock"
+
+	// HeaderSignTokenTimeout 签名有效期为 2 分钟
+	HeaderSignTokenTimeout = time.Minute * 2
 )
 
 func init() {
