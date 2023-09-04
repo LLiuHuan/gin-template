@@ -7,15 +7,15 @@ package interceptor
 
 import (
 	"encoding/json"
-	"github.com/LLiuHuan/gin-template/internal/services/admin"
-	"github.com/LLiuHuan/gin-template/pkg/urltable"
 	"net/http"
 
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
+	"github.com/LLiuHuan/gin-template/internal/services/admin"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
+	"github.com/LLiuHuan/gin-template/pkg/urltable"
 )
 
 func (i *interceptor) CheckRBAC() core.HandlerFunc {

@@ -6,17 +6,19 @@
 package config
 
 import (
+	"go/token"
+	"log"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
+
 	"github.com/dave/dst"
 	"github.com/dave/dst/decorator"
 	"github.com/spf13/cast"
 	"go.uber.org/zap"
-	"go/token"
-	"log"
 )
 
 const minBusinessCode = 20000

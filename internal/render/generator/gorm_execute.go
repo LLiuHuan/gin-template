@@ -7,12 +7,13 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"github.com/LLiuHuan/gin-template/configs"
-	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/LLiuHuan/gin-template/configs"
+	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 )
 
 type gormExecuteRequest struct {

@@ -6,9 +6,10 @@
 package urltable
 
 import (
-	"github.com/LLiuHuan/gin-template/pkg/errors"
 	"net/http"
 	"strings"
+
+	"github.com/LLiuHuan/gin-template/pkg/errors"
 )
 
 const (

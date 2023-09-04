@@ -409,9 +409,11 @@ func (c *context) URI() string {
 
 // RequestContext (包装 Trace + Logger) 获取请求的 context (当client关闭后，会自动canceled)
 func (c *context) RequestContext() StdContext {
+	// TODO: 这里应该用c.ctx.Request.Context()，还是stdctx.Background()?
+	// 但是gin的context没有实现这个方法
 	return StdContext{
-		//c.ctx.Request.Context(),
-		stdctx.Background(),
+		c.ctx.Request.Context(),
+		//stdctx.Background(),
 		c.Trace(),
 		c.Logger(),
 	}

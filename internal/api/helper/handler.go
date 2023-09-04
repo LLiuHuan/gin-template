@@ -10,6 +10,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/internal/services/authorized"
+
 	"go.uber.org/zap"
 )
 

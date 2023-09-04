@@ -7,10 +7,12 @@ package cron
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/database/cron_task"
+
 	"go.uber.org/zap"
-	"math"
 )
 
 func (s *server) Start() {

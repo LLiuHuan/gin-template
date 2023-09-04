@@ -6,8 +6,10 @@ package generator
 
 import (
 	"fmt"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
+
 	"go.uber.org/zap"
 )
 

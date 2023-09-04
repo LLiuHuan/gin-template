@@ -37,3 +37,16 @@ type DataBaseConfBase struct {
 	MaxOpenConn     int `toml:"maxOpenConn"`
 	ConnMaxLifeTime int `toml:"connMaxLifeTime"`
 }
+
+func (d *DataBase) GetDataBaseConfig() DataBaseConf {
+	switch d.Mode {
+	case "mysql":
+		return d.MySql
+	case "sqlserver":
+		return d.SqlServer
+	case "postgresql":
+		return d.PostgreSql
+	default:
+		return d.MySql
+	}
+}

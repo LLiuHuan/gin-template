@@ -5,11 +5,12 @@
 package upgrade
 
 import (
+	"net/http"
+
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/proposal/tablesqls"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
-	"net/http"
 )
 
 type upgradeExecuteRequest struct {

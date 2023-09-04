@@ -7,14 +7,15 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/LLiuHuan/gin-template/internal/router"
-	"go.uber.org/zap"
 	"net/http"
 
 	"github.com/LLiuHuan/gin-template/configs"
+	"github.com/LLiuHuan/gin-template/internal/router"
 	"github.com/LLiuHuan/gin-template/pkg/env"
 	"github.com/LLiuHuan/gin-template/pkg/logger"
 	"github.com/LLiuHuan/gin-template/pkg/timeutil"
+
+	"go.uber.org/zap"
 )
 
 // 初始化执行

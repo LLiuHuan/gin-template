@@ -6,10 +6,11 @@
 package cron
 
 import (
+	"strings"
+
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/database/cron_task"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
-	"strings"
 )
 
 func (s *server) AddTask(task *cron_task.CronTask) error {

@@ -7,18 +7,20 @@ package install
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
+	"runtime"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/proposal/tablesqls"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cast"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	"net/http"
-	"os"
-	"runtime"
 )
 
 type initExecuteRequest struct {

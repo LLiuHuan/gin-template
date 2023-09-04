@@ -6,6 +6,7 @@ package authorized
 
 import (
 	"encoding/json"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/repository/database"

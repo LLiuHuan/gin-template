@@ -7,6 +7,7 @@ package router
 
 import (
 	"errors"
+
 	"github.com/LLiuHuan/gin-template/internal/alert"
 	"github.com/LLiuHuan/gin-template/internal/metrics"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
@@ -14,6 +15,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/internal/router/interceptor"
+
 	"go.uber.org/zap"
 )
 

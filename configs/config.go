@@ -45,6 +45,7 @@ type Config struct {
 	Notify   Notify   `mapstructure:"notify" json:"notify" yaml:"notify" toml:"notify"`
 	Redis    Redis    `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`
 	DataBase DataBase `mapstructure:"database" json:"database" yaml:"database" toml:"database"`
+	HashIds  HashIds  `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"`
 }
 
 var (

@@ -5,7 +5,10 @@
 // @description: 错误处理
 package core
 
-import "github.com/LLiuHuan/gin-template/pkg/errors"
+import (
+	"github.com/LLiuHuan/gin-template/pkg/env"
+	"github.com/LLiuHuan/gin-template/pkg/errors"
+)
 
 var _ BusinessError = (*businessError)(nil)
 
@@ -73,6 +76,9 @@ func (e *businessError) BusinessCode() int {
 }
 
 func (e *businessError) Message() string {
+	if env.Active().IsDev() {
+		return e.message + ":" + e.stackError.Error()
+	}
 	return e.message
 }
 

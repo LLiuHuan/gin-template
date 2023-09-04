@@ -6,6 +6,7 @@ package upgrade
 
 import (
 	"fmt"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 )
@@ -32,9 +33,9 @@ func (h *handler) UpgradeView() core.HandlerFunc {
 
 		var tableCollect []tableInfo
 
-		mysqlConf := configs.Get().MySQL.Read
-		sqlTables := fmt.Sprintf("SELECT `table_name`,`table_comment` FROM `information_schema`.`tables` WHERE `table_schema`= '%s'", mysqlConf.Name)
-		rows, err := h.db.GetDbR().Raw(sqlTables).Rows()
+		mysqlConf := configs.Get().DataBase.GetDataBaseConfig().Read
+		sqlTables := fmt.Sprintf("SELECT `table_name`,`table_comment` FROM `information_schema`.`tables` WHERE `table_schema`= '%s'", mysqlConf.DataBase)
+		rows, err := h.db.GetDB().Raw(sqlTables).Rows()
 		if err != nil {
 			c.HTML("upgrade_view", tableCollect)
 			return

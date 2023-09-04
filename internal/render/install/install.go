@@ -5,12 +5,14 @@
 package install
 
 import (
+	"net/http"
+	"runtime"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/pkg/file"
+
 	"go.uber.org/zap"
-	"net/http"
-	"runtime"
 )
 
 type handler struct {

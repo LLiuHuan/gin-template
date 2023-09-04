@@ -1,16 +1,12 @@
-// Package helper
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2023-09-04 16:43
-// @description: md5加密
 package helper
 
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"net/http"
+
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
-	"net/http"
 )
 
 type md5Request struct {
