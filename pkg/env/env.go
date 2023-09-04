@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-16 15:36
+// @description: 运行环境
 package env
 
 import (

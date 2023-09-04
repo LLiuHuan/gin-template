@@ -1,3 +1,8 @@
+// Package interceptor
+// @program: gin-template
+// @author: [lliuhuan](https://github.com/lliuhuan)
+// @create: 2023-08-16 16:00
+// @description: 校验用户权限
 package interceptor
 
 import (

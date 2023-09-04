@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-17 10:32
+// @description: 邮件发送
 package mail
 
 import (

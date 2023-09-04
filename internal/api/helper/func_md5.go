@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-09-04 16:43
+// @description: md5加密
 package helper
 
 import (

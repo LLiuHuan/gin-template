@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-16 23:28
+// @description: 上下文
 package core
 
 import (
@@ -198,6 +199,7 @@ func (c *context) Redirect(code int, location string) {
 	c.ctx.Redirect(code, location)
 }
 
+// Trace 获取 Trace 对象
 func (c *context) Trace() Trace {
 	t, ok := c.ctx.Get(_TraceName)
 	if !ok || t == nil {
@@ -207,14 +209,17 @@ func (c *context) Trace() Trace {
 	return t.(Trace)
 }
 
+// setTrace 设置 Trace 对象
 func (c *context) setTrace(trace Trace) {
 	c.ctx.Set(_TraceName, trace)
 }
 
+// disableTrace 禁用 Trace
 func (c *context) disableTrace() {
 	c.setTrace(nil)
 }
 
+// Logger 获取 Logger 对象
 func (c *context) Logger() *zap.Logger {
 	logger, ok := c.ctx.Get(_LoggerName)
 	if !ok {
@@ -224,10 +229,12 @@ func (c *context) Logger() *zap.Logger {
 	return logger.(*zap.Logger)
 }
 
+// setLogger 设置 Logger 对象
 func (c *context) setLogger(logger *zap.Logger) {
 	c.ctx.Set(_LoggerName, logger)
 }
 
+// getPayload 获取 Payload
 func (c *context) getPayload() interface{} {
 	if payload, ok := c.ctx.Get(_PayloadName); ok != false {
 		return payload
@@ -235,10 +242,12 @@ func (c *context) getPayload() interface{} {
 	return nil
 }
 
+// Payload 设置 Payload
 func (c *context) Payload(payload interface{}) {
 	c.ctx.Set(_PayloadName, payload)
 }
 
+// getGraphPayload 获取 GraphPayload
 func (c *context) getGraphPayload() interface{} {
 	if payload, ok := c.ctx.Get(_GraphPayloadName); ok != false {
 		return payload
@@ -246,14 +255,17 @@ func (c *context) getGraphPayload() interface{} {
 	return nil
 }
 
+// GraphPayload 设置 GraphPayload
 func (c *context) GraphPayload(payload interface{}) {
 	c.ctx.Set(_GraphPayloadName, payload)
 }
 
+// HTML 渲染模板
 func (c *context) HTML(name string, obj interface{}) {
 	c.ctx.HTML(200, name+".html", obj)
 }
 
+// Header 获取 Header
 func (c *context) Header() http.Header {
 	header := c.ctx.Request.Header
 
@@ -267,14 +279,17 @@ func (c *context) Header() http.Header {
 	return clone
 }
 
+// GetHeader 获取 Header
 func (c *context) GetHeader(key string) string {
 	return c.ctx.GetHeader(key)
 }
 
+// SetHeader 设置 Header
 func (c *context) SetHeader(key, value string) {
 	c.ctx.Header(key, value)
 }
 
+// SessionUserInfo 获取 SessionUserInfo
 func (c *context) SessionUserInfo() proposal.SessionUserInfo {
 	val, ok := c.ctx.Get(_SessionUserInfo)
 	if !ok {
@@ -284,10 +299,12 @@ func (c *context) SessionUserInfo() proposal.SessionUserInfo {
 	return val.(proposal.SessionUserInfo)
 }
 
+// setSessionUserInfo 设置 SessionUserInfo
 func (c *context) setSessionUserInfo(info proposal.SessionUserInfo) {
 	c.ctx.Set(_SessionUserInfo, info)
 }
 
+// AbortWithError 中断请求并返回错误
 func (c *context) AbortWithError(err BusinessError) {
 	if err != nil {
 		httpCode := err.HTTPCode()
@@ -300,11 +317,13 @@ func (c *context) AbortWithError(err BusinessError) {
 	}
 }
 
+// abortError 获取 AbortWithError 设置的错误
 func (c *context) abortError() BusinessError {
 	err, _ := c.ctx.Get(_AbortErrorName)
 	return err.(BusinessError)
 }
 
+// Alias 获取别名
 func (c *context) Alias() string {
 	path, ok := c.ctx.Get(_Alias)
 	if !ok {
@@ -314,12 +333,14 @@ func (c *context) Alias() string {
 	return path.(string)
 }
 
+// setAlias 设置别名
 func (c *context) setAlias(path string) {
 	if path = strings.TrimSpace(path); path != "" {
 		c.ctx.Set(_Alias, path)
 	}
 }
 
+// isRecordMetrics 是否记录指标
 func (c *context) isRecordMetrics() bool {
 	isRecordMetrics, ok := c.ctx.Get(_IsRecordMetrics)
 	if !ok {
@@ -329,10 +350,12 @@ func (c *context) isRecordMetrics() bool {
 	return isRecordMetrics.(bool)
 }
 
+// ableRecordMetrics 设置是否记录指标
 func (c *context) ableRecordMetrics() {
 	c.ctx.Set(_IsRecordMetrics, true)
 }
 
+// disableRecordMetrics 设置是否记录指标
 func (c *context) disableRecordMetrics() {
 	c.ctx.Set(_IsRecordMetrics, false)
 }
@@ -399,12 +422,14 @@ func (c *context) ResponseWriter() gin.ResponseWriter {
 	return c.ctx.Writer
 }
 
+// newContext 创建 Context
 func newContext(ctx *gin.Context) Context {
 	context := contextPool.Get().(*context)
 	context.ctx = ctx
 	return context
 }
 
+// releaseContext 释放 Context
 func releaseContext(ctx Context) {
 	c := ctx.(*context)
 	c.ctx = nil

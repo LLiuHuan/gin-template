@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-17 09:42
+// @description: 链路追踪
 package trace
 
 import (

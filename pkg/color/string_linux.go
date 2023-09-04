@@ -1,10 +1,10 @@
-//go:build darwin
+//go:build linux
 
 // Package color
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2023-08-17 00:24
-// @description: Darwin颜色
+// @create: 2023-09-04 17:13
+// @description: Linux颜色
 package color
 
 import (

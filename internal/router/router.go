@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-16 16:00
+// @description: 路由
 package router
 
 import (
@@ -85,6 +86,8 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	r.mux = mux
 	// 拦截器
 	r.interceptors = interceptor.New(logger, r.cache, r.db)
+
+	setRenderRouter(r)
 
 	setApiRouter(r)
 

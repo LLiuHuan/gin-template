@@ -2,10 +2,10 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-09-04 16:43
+// @description: sign签名
 package helper
 
 import (
-	"fmt"
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
@@ -72,8 +72,6 @@ func (h *handler) Sign() core.HandlerFunc {
 			)
 			return
 		}
-
-		fmt.Println(req.Params)
 
 		params, err := url.ParseQuery(req.Params)
 		if err != nil {

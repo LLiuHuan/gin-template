@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-16 23:32
+// @description: 多路复用器
 package core
 
 import (

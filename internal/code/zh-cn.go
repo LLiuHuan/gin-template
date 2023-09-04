@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-17 10:15
+// @description: 中文错误码
 package code
 
 var zhCNText = map[int]string{

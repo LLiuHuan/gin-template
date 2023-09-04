@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-16 23:23
+// @description: 提案/建议 告警信息
 package proposal
 
 import (

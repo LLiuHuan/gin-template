@@ -1,10 +1,10 @@
-//go:build darwin
+//go:build windows
 
 // Package color
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2023-08-17 00:24
-// @description: Darwin颜色
+// @create: 2023-09-04 17:13
+// @description: Windows颜色
 package color
 
 import (
@@ -22,30 +22,30 @@ func RandomColor() string {
 
 // Yellow ...
 func Yellow(msg string) string {
-	return fmt.Sprintf("\x1b[33m%s\x1b[0m", msg)
+	return fmt.Sprintf("%s", msg)
 }
 
 // Red ...
 func Red(msg string) string {
-	return fmt.Sprintf("\x1b[31m%s\x1b[0m", msg)
+	return fmt.Sprintf("%s", msg)
 }
 
 // Redf ...
 func Redf(msg string, arg interface{}) string {
-	return fmt.Sprintf("\x1b[31m%s\x1b[0m %+v\n", msg, arg)
+	return fmt.Sprintf("%s %+v\n", msg, arg)
 }
 
 // Blue ...
 func Blue(msg string) string {
-	return fmt.Sprintf("\x1b[34m%s\x1b[0m", msg)
+	return fmt.Sprintf("%s", msg)
 }
 
 // Green ...
 func Green(msg string) string {
-	return fmt.Sprintf("\x1b[32m%s\x1b[0m", msg)
+	return fmt.Sprintf("%s", msg)
 }
 
 // Greenf ...
 func Greenf(msg string, arg interface{}) string {
-	return fmt.Sprintf("\x1b[32m%s\x1b[0m %+v\n", msg, arg)
+	return fmt.Sprintf("%s %+v\n", msg, arg)
 }

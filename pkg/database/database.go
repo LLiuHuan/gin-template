@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-21 11:00
+// @description: 数据库
 package database
 
 import (
@@ -10,7 +11,11 @@ import (
 )
 
 // Copied from golint
+
+// commonInitialismsReplacer is a strings.Replacer that replaces common initialisms.
 var commonInitialismsReplacer *strings.Replacer
+
+// commonInitialisms is a list of common initialisms.
 var commonInitialisms = []string{"API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "LHS", "QPS", "RAM", "RHS", "RPC", "SLA", "SMTP", "SSH", "TLS", "TTL", "UID", "UI", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XSRF", "XSS"}
 
 func init() {

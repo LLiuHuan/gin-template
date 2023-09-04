@@ -1,3 +1,8 @@
+// Package interceptor
+// @program: gin-template
+// @author: [lliuhuan](https://github.com/lliuhuan)
+// @create: 2023-08-16 16:00
+// @description: 校验签名
 package interceptor
 
 import (
@@ -14,12 +19,15 @@ import (
 	"github.com/LLiuHuan/gin-template/pkg/urltable"
 )
 
+// whiteListPath 白名单
 var whiteListPath = map[string]bool{
 	"/login/web": true,
 }
 
+// CheckSignature 校验签名
 func (i *interceptor) CheckSignature() core.HandlerFunc {
 	return func(c core.Context) {
+		// 判断是不是正是环境
 		if !env.Active().IsPro() {
 			return
 		}

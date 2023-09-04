@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-16 23:24
+// @description: 提案/建议 指标信息
 package proposal
 
 import "encoding/json"

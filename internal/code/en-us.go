@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-17 10:14
+// @description: 英文错误码
 package code
 
 var enUSText = map[int]string{

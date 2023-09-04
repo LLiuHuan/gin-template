@@ -2,9 +2,12 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-09-04 16:35
+// @description: api 路由
 package router
 
-import "github.com/LLiuHuan/gin-template/internal/helper"
+import (
+	"github.com/LLiuHuan/gin-template/internal/api/helper"
+)
 
 func setApiRouter(r *resource) {
 	// helper

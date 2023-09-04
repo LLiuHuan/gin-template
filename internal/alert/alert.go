@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-17 10:20
+// @description: 告警通知
 package alert
 
 import (
@@ -36,6 +37,7 @@ func NotifyHandler(logger *zap.Logger) func(msg *proposal.AlertMessage) {
 	}
 }
 
+// sendEmail 发送邮件
 func sendEmail(logger *zap.Logger, msg *proposal.AlertMessage) {
 	cfg := configs.Get().Notify.Mail
 	if cfg.Host == "" || cfg.Port == 0 || cfg.User == "" || cfg.Pass == "" || cfg.To == "" {
@@ -70,6 +72,7 @@ func sendEmail(logger *zap.Logger, msg *proposal.AlertMessage) {
 	}
 }
 
+// sendWeChat 发送微信
 func sendWeChat(logger *zap.Logger, msg *proposal.AlertMessage) {
 	cfg := configs.Get().Notify.WeChat
 	if cfg.Key == "" {

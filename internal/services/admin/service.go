@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-22 02:43
+// @description: admin 服务
 package admin
 
 import (

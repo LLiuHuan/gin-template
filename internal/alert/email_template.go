@@ -52,6 +52,7 @@ func getEmailHTMLContent(mailTpl string, mailData interface{}) (string, error) {
 	return buffer.String(), nil
 }
 
+// mailTemplate 邮件模板
 const mailTemplate = `
 <!DOCTYPE html>
 <html>

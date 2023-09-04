@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-21 10:16
+// @description: 错误处理
 package errors
 
 import (

@@ -2,6 +2,7 @@
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-08-22 03:30
+// @description: 生成签名
 package signature
 
 import (
