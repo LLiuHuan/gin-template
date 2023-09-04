@@ -6,6 +6,7 @@ package router
 
 import (
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
+	"github.com/LLiuHuan/gin-template/internal/render/cron"
 	"github.com/LLiuHuan/gin-template/internal/render/generator"
 	"github.com/LLiuHuan/gin-template/internal/render/install"
 )
@@ -21,7 +22,7 @@ func setRenderRouter(r *resource) {
 	//renderTool := tool.New(r.logger, r.db, r.cache)
 	//renderAdmin := admin.New(r.logger, r.db, r.cache)
 	//renderUpgrade := upgrade.New(r.logger, r.db, r.cache)
-	//renderCron := cron.New(r.logger, r.db, r.cache)
+	renderCron := cron.New(r.logger, r.db, r.cache)
 
 	// 无需记录日志，无需 RBAC 权限验证
 	notRBAC := r.mux.Group("", core.DisableTraceLog, core.DisableRecordMetrics)
@@ -79,10 +80,10 @@ func setRenderRouter(r *resource) {
 		//render.GET("/tool/cache", renderTool.Cache())
 		//render.GET("/tool/data", renderTool.Data())
 		//render.GET("/tool/websocket", renderTool.Websocket())
-		//
-		//// 后台任务
-		//render.GET("/cron/list", renderCron.List())
-		//render.GET("/cron/add", renderCron.Add())
-		//render.GET("/cron/edit/:id", renderCron.Edit())
+
+		// 后台任务
+		render.GET("/cron/list", renderCron.List())
+		render.GET("/cron/add", renderCron.Add())
+		render.GET("/cron/edit/:id", renderCron.Edit())
 	}
 }
