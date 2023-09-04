@@ -86,7 +86,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	// 拦截器
 	r.interceptors = interceptor.New(logger, r.cache, r.db)
 
-	setRenderRouter(r)
+	setApiRouter(r)
 
 	s := new(Server)
 	s.Mux = mux

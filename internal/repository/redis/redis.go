@@ -72,9 +72,7 @@ func New() (Repo, error) {
 	case ClusterMode:
 		client = NewClusterClient(cfg)
 	default:
-		// TODO: 返回异常
 		panic("invalid redis mode")
-		//return nil, errors.New("1111")
 	}
 
 	// TODO: context
@@ -90,6 +88,7 @@ func New() (Repo, error) {
 
 func (c *cacheRepo) i() {}
 
+// NewClient 默认使用Simple模式
 func NewClient(cfg configs.Redis) redis.UniversalClient {
 	if cfg.Addr == "" {
 		//elog.ErrorCtx(emptyCtx, eredis_config.PkgName, elog.FieldName(c.Name), elog.FieldError(fmt.Errorf(`invalid "addr" config, "addr" is empty but with stub mode"`)))

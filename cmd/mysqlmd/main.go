@@ -13,6 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: 支持多个数据库
+
 type tableInfo struct {
 	Name    string         `db:"table_name"`    // name
 	Comment sql.NullString `db:"table_comment"` // comment
