@@ -7,15 +7,14 @@ package main
 import (
 	"errors"
 	"fmt"
-	"net/http"
-
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/router"
 	"github.com/LLiuHuan/gin-template/pkg/env"
+	"github.com/LLiuHuan/gin-template/pkg/grace"
 	"github.com/LLiuHuan/gin-template/pkg/logger"
 	"github.com/LLiuHuan/gin-template/pkg/timeutil"
-
 	"go.uber.org/zap"
+	"net/http"
 )
 
 // 初始化执行
@@ -69,19 +68,7 @@ func main() {
 		panic(err)
 	}
 
-	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port),
-		Handler: s.Mux,
-	}
-
-	//go func() {
-	//	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-	//		accessLogger.Fatal("http server startup err", zap.Error(err))
-	//	}
-	//}()
-
-	//fmt.Println(database.ToDBName("CronTask"))
-
+	server := grace.NewServer(fmt.Sprintf("%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port), s.Mux, s.Opts...)
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		fmt.Println(err)
 		accessLogger.Fatal("http server startup err", zap.Error(err))

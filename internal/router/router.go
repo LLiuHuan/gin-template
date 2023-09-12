@@ -7,6 +7,7 @@ package router
 
 import (
 	"errors"
+	"github.com/LLiuHuan/gin-template/pkg/grace"
 
 	"github.com/LLiuHuan/gin-template/internal/alert"
 	"github.com/LLiuHuan/gin-template/internal/metrics"
@@ -33,6 +34,7 @@ type Server struct {
 	Db         database.Repo
 	Cache      redis.Repo
 	CronServer cron.Server
+	Opts       []grace.ServerOption
 }
 
 func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) {
@@ -54,6 +56,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	dbRepo, err := database.New()
 	if err != nil {
 		logger.Fatal("new db err", zap.Error(err))
+		panic(err)
 	}
 	r.db = dbRepo
 
@@ -61,6 +64,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	cacheRepo, err := redis.New()
 	if err != nil {
 		logger.Fatal("new cache err", zap.Error(err))
+		panic(err)
 	}
 	r.cache = cacheRepo
 
@@ -68,6 +72,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	cronServer, err := cron.New(cronLogger, dbRepo, cacheRepo)
 	if err != nil {
 		logger.Fatal("new cron err", zap.Error(err))
+		panic(err)
 	}
 	cronServer.Start()
 	r.cronServer = cronServer
@@ -98,6 +103,33 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	s.Db = r.db
 	s.Cache = r.cache
 	s.CronServer = r.cronServer
+	s.initOptions(logger)
 
 	return s, nil
+}
+
+// initOptions 初始化选项
+// TODO: 待优化，感觉不够优雅
+func (s Server) initOptions(logger *zap.Logger) {
+	s.Opts = append(s.Opts, grace.WithShutdownCallback(func() {
+		if s.Db != nil {
+			if err := s.Db.DBClose(); err != nil {
+				logger.Error("dbw close err", zap.Error(err))
+			}
+		}
+	}))
+
+	s.Opts = append(s.Opts, grace.WithShutdownCallback(func() {
+		if s.Cache != nil {
+			if err := s.Cache.Close(); err != nil {
+				logger.Error("cache close err", zap.Error(err))
+			}
+		}
+	}))
+
+	s.Opts = append(s.Opts, grace.WithShutdownCallback(func() {
+		if s.CronServer != nil {
+			s.CronServer.Stop()
+		}
+	}))
 }

@@ -41,11 +41,11 @@ type TomlConfigInterf interface {
 }
 
 type Config struct {
-	Project  Project  `mapstructure:"project" json:"project" yaml:"project" toml:"project"`
-	Notify   Notify   `mapstructure:"notify" json:"notify" yaml:"notify" toml:"notify"`
-	Redis    Redis    `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`
-	DataBase DataBase `mapstructure:"database" json:"database" yaml:"database" toml:"database"`
-	HashIds  HashIds  `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"`
+	Project  Project  `mapstructure:"project" json:"project" yaml:"project" toml:"project"`     // 项目信息
+	Notify   Notify   `mapstructure:"notify" json:"notify" yaml:"notify" toml:"notify"`         // 通知配置
+	Redis    Redis    `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`             // redis配置
+	DataBase DataBase `mapstructure:"database" json:"database" yaml:"database" toml:"database"` // 数据库配置
+	HashIds  HashIds  `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"`  // hashIds配置
 }
 
 var (
@@ -168,7 +168,7 @@ func (y *ymlConfig) keyIsCache(keyName string) bool {
 
 // 对键值进行缓存
 func (y *ymlConfig) cache(keyName string, value interface{}) (bool, error) {
-	// 避免瞬间缓存键、值时，程序提示键名已经被注册的日志输出
+	// 避免缓存键、值时，程序提示键名已经被注册的日志输出
 	y.mu.Lock()
 	defer y.mu.Unlock()
 	if _, exists := containerFactory.KeyIsExists(ConfigKeyPrefix + keyName); exists {
