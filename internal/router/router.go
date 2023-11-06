@@ -7,6 +7,9 @@ package router
 
 import (
 	"errors"
+	"fmt"
+	"github.com/LLiuHuan/gin-template/configs"
+	"github.com/LLiuHuan/gin-template/pkg/file"
 	"github.com/LLiuHuan/gin-template/pkg/grace"
 
 	"github.com/LLiuHuan/gin-template/internal/alert"
@@ -45,38 +48,38 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	r := new(resource)
 	r.logger = logger
 
-	//openBrowserUri := fmt.Sprintf("http://%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port)
+	openBrowserUri := fmt.Sprintf("http://%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port)
 
 	// TODO: 后续判断一下是否安装，如果没安装可以提示让跳转到初始化页面
-	//_, ok := file.IsExists(configs.ProjectInstallMark)
-	//if !ok { // 未安装
-	//	openBrowserUri += "/install"
-	//} else { // 已安装
-	// 初始化 DB
-	dbRepo, err := database.New()
-	if err != nil {
-		logger.Fatal("new db err", zap.Error(err))
-		panic(err)
-	}
-	r.db = dbRepo
+	_, ok := file.IsExists(configs.ProjectInstallMark)
+	if !ok { // 未安装
+		openBrowserUri += "/install"
+	} else { // 已安装
+		// 初始化 DB
+		dbRepo, err := database.New()
+		if err != nil {
+			logger.Fatal("new db err", zap.Error(err))
+			panic(err)
+		}
+		r.db = dbRepo
 
-	// 初始化 Cache
-	cacheRepo, err := redis.New()
-	if err != nil {
-		logger.Fatal("new cache err", zap.Error(err))
-		panic(err)
-	}
-	r.cache = cacheRepo
+		// 初始化 Cache
+		cacheRepo, err := redis.New()
+		if err != nil {
+			logger.Fatal("new cache err", zap.Error(err))
+			panic(err)
+		}
+		r.cache = cacheRepo
 
-	// 初始化 CRON Server
-	cronServer, err := cron.New(cronLogger, dbRepo, cacheRepo)
-	if err != nil {
-		logger.Fatal("new cron err", zap.Error(err))
-		panic(err)
+		// 初始化 CRON Server
+		cronServer, err := cron.New(cronLogger, dbRepo, cacheRepo)
+		if err != nil {
+			logger.Fatal("new cron err", zap.Error(err))
+			panic(err)
+		}
+		cronServer.Start()
+		r.cronServer = cronServer
 	}
-	cronServer.Start()
-	r.cronServer = cronServer
-	//}
 
 	mux, err := core.NewRouter(logger,
 		//core.WithEnableOpenBrowser(openBrowserUri),

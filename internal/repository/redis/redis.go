@@ -79,6 +79,7 @@ func New() (Repo, error) {
 	// TODO: context
 	ctx := context.Background()
 	if err := client.Ping(ctx).Err(); err != nil {
+
 		return nil, errors.Wrap(err, "ping redis err")
 	}
 

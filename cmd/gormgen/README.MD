@@ -8,7 +8,7 @@
 
 例如：
 ```
-./scripts/gormgen.sh 127.0.0.1:3306 root root go_gin_api user_demo
+./scripts/gormgen.sh 127.0.0.1:3306 root root gin-template user_demo
 ```
 
 ## 参考

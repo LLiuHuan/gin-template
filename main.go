@@ -57,7 +57,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	defer func() {
 		_ = accessLogger.Sync()
 		_ = cronLogger.Sync()
@@ -67,10 +66,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	server := grace.NewServer(fmt.Sprintf("%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port), s.Mux, s.Opts...)
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		fmt.Println(err)
 		accessLogger.Fatal("http server startup err", zap.Error(err))
 	}
 }

@@ -1,5 +1,5 @@
 // Package grace
-// @program: go-gin-api-master
+// @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-09-11 17:26
 package grace

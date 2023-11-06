@@ -552,7 +552,7 @@ func NewRouter(logger *zap.Logger, options ...Option) (Mux, error) {
 				Timestamp:   time.Now(),
 				Environment: env.Active().Value(),
 				Host:        ctx.Host(),
-				Status:      "ok222",
+				Status:      "ok777",
 			}
 			ctx.Payload(resp)
 		})

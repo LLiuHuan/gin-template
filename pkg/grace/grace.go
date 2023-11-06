@@ -1,5 +1,5 @@
 // Package grace
-// @program: go-gin-api-master
+// @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-09-11 17:22
 package grace
@@ -8,7 +8,6 @@ import (
 	"github.com/cloudflare/tableflip"
 	"net/http"
 	"os"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -53,8 +52,6 @@ var (
 )
 
 func init() {
-	//flag.BoolVar(&isChild, "graceful", false, "listen on open fd (after forking)")
-	//flag.StringVar(&socketOrder, "socketorder", "", "previous initialization order - used when more than one listener was started")
 	socketOrder = os.Getenv("ENDLESS_SOCKET_ORDER")
 	isChild = os.Getenv("ENDLESS_CONTINUE") != ""
 
@@ -85,27 +82,12 @@ func NewServer(addr string, handler http.Handler, opts ...ServerOption) (srv *Se
 	regLock.Lock()
 	defer regLock.Unlock()
 
-	//if !flag.Parsed() {
-	//	flag.Parse()
-	//}
-	if len(socketOrder) > 0 {
-		for i, addr := range strings.Split(socketOrder, ",") {
-			socketPtrOffsetMap[addr] = uint(i)
-		}
-	} else {
-		socketPtrOffsetMap[addr] = uint(len(runningServersOrder))
-	}
-
 	upg, err := tableflip.New(tableflip.Options{
 		PIDFile: "/Users/liuhuan/Project/0x3/Golang/gin-template/.pid",
 	})
 	if err != nil {
 		panic(err)
 	}
-	//	//defer func() {
-	//	//	fmt.Println("upg.Stop()")
-	//	//	upg.Stop()
-	//	//}(
 
 	srv = &Server{
 		sigChan: make(chan os.Signal),
@@ -127,6 +109,7 @@ func NewServer(addr string, handler http.Handler, opts ...ServerOption) (srv *Se
 		terminalChan: make(chan error), // no cache channel
 		upg:          upg,
 	}
+
 	srv.Server = &http.Server{
 		Addr:           addr,
 		ReadTimeout:    DefaultReadTimeOut,

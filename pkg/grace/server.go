@@ -1,5 +1,5 @@
 // Package grace
-// @program: go-gin-api-master
+// @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2023-09-11 17:22
 package grace
@@ -69,21 +69,32 @@ func (srv *Server) internalServe(ln net.Listener) (err error) {
 		srv.upg.Stop()
 		fmt.Println("upg.Stop()")
 	}()
-	srv.upg.Ready()
 
-	// When Shutdown is called, Serve, ListenAndServe, and ListenAndServeTLS
-	// immediately return ErrServerClosed. Make sure the program doesn't exit
-	// and waits instead for Shutdown to return.
-	if err = srv.Server.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Println(syscall.Getpid(), "Server.Serve() error:", err)
-		return err
+	go func() {
+		// When Shutdown is called, Serve, ListenAndServe, and ListenAndServeTLS
+		// immediately return ErrServerClosed. Make sure the program doesn't exit
+		// and waits instead for Shutdown to return.
+		if err = srv.Server.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Println(syscall.Getpid(), "Server.Serve() error:", err)
+		}
+	}()
+
+	if err = srv.upg.Ready(); err != nil {
+		panic(err)
 	}
 
-	log.Println(syscall.Getpid(), ln.Addr(), "Listener closed.")
 	// wait for Shutdown to return
 	if shutdownErr := <-srv.terminalChan; shutdownErr != nil {
 		return shutdownErr
 	}
+
+	log.Println(syscall.Getpid(), ln.Addr(), "Listener closed.")
+
+	time.AfterFunc(30*time.Second, func() {
+		os.Exit(1)
+	})
+
+	//srv.upg.Shutdown(context.Background())
 	return
 }
 
@@ -295,12 +306,6 @@ func (srv *Server) handleSignals() {
 		switch sig {
 		case syscall.SIGHUP:
 			log.Println(pid, "Received SIGHUP. forking.")
-			//err := srv.fork()
-			//if err != nil {
-			//	log.Println("Fork err:", err)
-			//}
-			//srv.upg.Stop()
-			//time.Sleep(time.Second * 1)
 			err := srv.upg.Upgrade()
 			if err != nil {
 				log.Println("Upgrade failed:", err)
