@@ -317,6 +317,7 @@ func (srv *Server) shutdown() {
 		defer cancel()
 	}
 	for _, shutdownCallback := range srv.shutdownCallbacks {
+		fmt.Println("shutdownCallback")
 		shutdownCallback()
 	}
 	srv.terminalChan <- srv.Server.Shutdown(ctx)

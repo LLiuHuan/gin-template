@@ -7,6 +7,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"net/http"
+	"time"
 )
 
 type md5Request struct {
@@ -42,6 +43,7 @@ func (h *handler) Md5() core.HandlerFunc {
 		}
 
 		fmt.Println("md5Request:", req)
+		time.Sleep(time.Second * 30)
 
 		m := md5.New()
 		m.Write([]byte(req.Str))

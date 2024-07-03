@@ -123,6 +123,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 // TODO: 待优化，感觉不够优雅
 func (s Server) initOptions(logger *zap.Logger) {
 	s.Opts = append(s.Opts, grace.WithShutdownCallback(func() {
+		fmt.Println("close db")
 		if s.Db != nil {
 			if err := s.Db.DBClose(); err != nil {
 				logger.Error("dbw close err", zap.Error(err))
@@ -131,6 +132,7 @@ func (s Server) initOptions(logger *zap.Logger) {
 	}))
 
 	s.Opts = append(s.Opts, grace.WithShutdownCallback(func() {
+		fmt.Println("close cache")
 		if s.Cache != nil {
 			if err := s.Cache.Close(); err != nil {
 				logger.Error("cache close err", zap.Error(err))
@@ -139,6 +141,7 @@ func (s Server) initOptions(logger *zap.Logger) {
 	}))
 
 	s.Opts = append(s.Opts, grace.WithShutdownCallback(func() {
+		fmt.Println("close cron")
 		if s.CronServer != nil {
 			s.CronServer.Stop()
 		}
