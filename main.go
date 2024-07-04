@@ -9,12 +9,13 @@ import (
 	"fmt"
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/router"
-	"github.com/LLiuHuan/gin-template/pkg/app"
 	"github.com/LLiuHuan/gin-template/pkg/env"
-	"github.com/LLiuHuan/gin-template/pkg/grace"
 	"github.com/LLiuHuan/gin-template/pkg/kprocess"
 	"github.com/LLiuHuan/gin-template/pkg/logger"
 	"github.com/LLiuHuan/gin-template/pkg/timeutil"
+	"net/http"
+	"os"
+	"time"
 )
 
 // 初始化执行
@@ -70,11 +71,15 @@ func main() {
 		panic(err)
 	}
 
-	server := grace.NewServer(fmt.Sprintf("%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port), s.Mux, s.Opts...)
+	addr := fmt.Sprintf("%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port)
 	kp := kprocess.NewKProcess(accessLogger, configs.Get().Project.PidFile)
-	ln, err := kp.Listen("tcp", server.Addr)
+	ln, err := kp.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
+	}
+
+	serve := http.Server{
+		Handler: s.Mux,
 	}
 
 	serverCloe := make(chan struct{})
@@ -82,9 +87,10 @@ func main() {
 		defer func() {
 			close(serverCloe)
 		}()
-		err = server.ServeWithListener(ln)
+		err = serve.Serve(ln)
 		if err != nil {
 			accessLogger.Info(fmt.Sprintf("App run Serve: %v\n", err))
+			fmt.Printf("App run Serve: %v\n", err)
 		}
 	}()
 
@@ -96,12 +102,20 @@ func main() {
 	// Make sure to set a deadline on exiting the process
 	// after upg.Exit() is closed. No new upgrades can be
 	// performed if the parent doesn't exit.
-	app.AppPrepareForceExit(accessLogger)
+	time.AfterFunc(30*time.Second, func() {
+		accessLogger.Info("App server Shutdown timeout, force exit")
+		fmt.Println("App server Shutdown timeout, force exit")
+		os.Exit(1)
+	})
 
-	err = server.Shutdown(context.Background())
+	err = serve.Shutdown(context.Background())
 	if err != nil {
 		accessLogger.Info(fmt.Sprintf("App run Shutdown: %v\n", err))
+		fmt.Printf("App run Shutdown: %v\n", err)
 	}
 
 	accessLogger.Info("App server Shutdown ok")
+	fmt.Println("App server Shutdown ok")
+
+	router.ShutdownServer(accessLogger, s)
 }

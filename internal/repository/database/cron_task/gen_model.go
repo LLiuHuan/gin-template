@@ -26,3 +26,7 @@ type CronTask struct {
 	UpdatedAt           time.Time `gorm:"time"` // 更新时间
 	UpdatedUser         string    // 更新人
 }
+
+func (*CronTask) TableName() string {
+	return "cron_task"
+}

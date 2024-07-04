@@ -11,8 +11,8 @@ import (
 	"net/http"
 )
 
-// MiddleCors 处理跨域请求,支持options访问
-func MiddleCors() gin.HandlerFunc {
+// MiddlewareCors 处理跨域请求,支持options访问
+func MiddlewareCors() gin.HandlerFunc {
 	return cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{

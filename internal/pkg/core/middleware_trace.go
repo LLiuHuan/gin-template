@@ -21,10 +21,10 @@ import (
 	"time"
 )
 
-func MiddleTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
+func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 	// withoutTracePaths 这些请求，默认不记录日志
 	withoutTracePaths := map[string]bool{
-		"/metrics": true,
+		"/debug/metrics": true,
 
 		"/debug/pprof/":             true,
 		"/debug/pprof/cmdline":      true,

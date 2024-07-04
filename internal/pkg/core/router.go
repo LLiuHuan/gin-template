@@ -88,12 +88,12 @@ func NewRouter(logger *zap.Logger, options ...Option) (Mux, error) {
 
 	if !opt.disablePrometheus {
 		// prometheus
-		mux.engine.GET("/metrics", gin.WrapH(promhttp.Handler())) // register prometheus
+		mux.engine.GET("/debug/metrics", gin.WrapH(promhttp.Handler())) // register prometheus
 	}
 
 	if opt.enableCors {
 		// 跨域
-		mux.engine.Use(MiddleCors())
+		mux.engine.Use(MiddlewareCors())
 	}
 
 	if opt.enableOpenBrowser != "" {
@@ -101,13 +101,13 @@ func NewRouter(logger *zap.Logger, options ...Option) (Mux, error) {
 	}
 
 	// recover两次，防止处理时发生panic，尤其是在OnPanicNotify中。
-	mux.engine.Use(MiddleRecover(logger))
+	mux.engine.Use(MiddlewareRecover(logger))
 
-	mux.engine.Use(MiddleTrace(logger, opt))
+	mux.engine.Use(MiddlewareTrace(logger, opt))
 
 	// 限流
 	if opt.enableRate {
-		mux.engine.Use(MiddleLimit())
+		mux.engine.Use(MiddlewareLimit())
 	}
 
 	//

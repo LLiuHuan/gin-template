@@ -47,6 +47,10 @@ func NewKProcess(logger *zap.Logger, pidFile string) KProcess {
 // 这显示了如何使用升级程序
 // 使用 net/http 的优雅关闭功能。
 func (k *kProcess) Listen(network, addr string) (ln net.Listener, err error) {
+	if addr == "" {
+		addr = ":http"
+	}
+
 	k.pid = os.Getpid()
 	k.logger.Info(fmt.Sprintf("exec process pid %d \n", k.pid))
 
@@ -68,6 +72,7 @@ func (k *kProcess) Listen(network, addr string) (ln net.Listener, err error) {
 			return nil, err
 		}
 	}
+
 	if err := k.processUp.Ready(); err != nil {
 		return nil, err
 	}

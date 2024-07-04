@@ -53,7 +53,6 @@ func New() (Repo, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &dbRepo{
 		DB: db,
 	}, nil

@@ -12,7 +12,7 @@ import (
 	"runtime/debug"
 )
 
-func MiddleRecover(logger *zap.Logger) gin.HandlerFunc {
+func MiddlewareRecover(logger *zap.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func MiddleLimit() gin.HandlerFunc {
+func MiddlewareLimit() gin.HandlerFunc {
 	// TODO: 修改改成修改配置文件的方式
 	limiter := rate.NewLimiter(rate.Every(time.Second*1), configs.MaxRequestsPerSecond)
 	return func(ctx *gin.Context) {
