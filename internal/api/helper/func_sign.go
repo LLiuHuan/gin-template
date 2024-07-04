@@ -2,13 +2,14 @@ package helper
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
 	"github.com/LLiuHuan/gin-template/pkg/signature"
-	"net/http"
-	"net/url"
 )
 
 type signRequest struct {

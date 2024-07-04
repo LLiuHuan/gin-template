@@ -1,52 +1,68 @@
-[project]
-  domain = "127.0.0.1"
-  port = 8087
-  local = "zh-cn"
-  pidfile = ".pid"
 [database]
-  mode = "mysql"
-  [database.mysql]
-    isOpenReadDB = 1
-    [database.mysql.base]
-      connMaxLifeTime = 60
-      maxIdleConn = 60
-      maxOpenConn = 1
-    [database.mysql.read]
-      host = "127.0.0.1"
-      port = 3306
-      dataBase = "gin-template"
-      pass = "root"
-      user = "root"
-    [database.mysql.write]
-      host = "127.0.0.1"
-      port = 3306
-      dataBase = "gin-template"
-      pass = "root"
-      user = "root"
-  [database.postgresql]
-    isOpenReadDB = 1
-    [database.postgresql.base]
-      connMaxLifeTime = 60
-      maxIdleConn = 60
-      maxOpenConn = 1
-    [database.postgresql.read]
-      host = "127.0.0.1"
-      port = 5432
-      dataBase = "postgres"
-      pass = "qwer1234"
-      user = "postgres"
-    [database.postgresql.write]
-      host = "127.0.0.1"
-      port = 5432
-      dataBase = "postgres"
-      pass = "qwer1234"
-      user = "postgres"
+mode = 'mysql'
 
-[redis]
-  mode = "simple"
-  addr = "127.0.0.1:6379"
-  db = 1
-  pass = "bigdata"
+[database.mysql]
+isopenreaddb = 1
+
+[database.mysql.base]
+connmaxlifetime = 60
+host = '127.0.0.1'
+maxidleconn = 60
+maxopenconn = 1
+name = 'gin-template'
+pass = 'root'
+port = 3306
+user = 'root'
+
+[database.mysql.read]
+database = 'gin-template'
+host = '127.0.0.1'
+name = 'gin-template'
+pass = 'root'
+port = 3306
+user = 'root'
+
+[database.mysql.write]
+database = 'gin-template'
+host = '127.0.0.1'
+name = 'gin-template'
+pass = 'root'
+port = 3306
+user = 'root'
+
+[database.postgresql]
+isopenreaddb = 1
+
+[database.postgresql.base]
+connmaxlifetime = 60
+maxidleconn = 60
+maxopenconn = 1
+
+[database.postgresql.read]
+database = 'postgres'
+host = '127.0.0.1'
+pass = 'qwer1234'
+port = 5432
+user = 'postgres'
+
+[database.postgresql.write]
+database = 'postgres'
+host = '127.0.0.1'
+pass = 'qwer1234'
+port = 5432
+user = 'postgres'
 
 [hash-ids]
-    alphabet = "FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE"
+alphabet = 'FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE'
+
+[project]
+domain = '127.0.0.1'
+local = 'zh-cn'
+pidfile = '.pid'
+port = 8087
+
+[redis]
+addr = '127.0.0.1:6379'
+db = '1'
+mode = 'simple'
+pass = 'bigdata'

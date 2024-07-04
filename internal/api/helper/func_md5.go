@@ -4,10 +4,11 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/LLiuHuan/gin-template/internal/code"
-	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"net/http"
 	"time"
+
+	"github.com/LLiuHuan/gin-template/internal/code"
+	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 )
 
 type md5Request struct {

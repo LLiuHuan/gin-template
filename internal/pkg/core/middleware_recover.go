@@ -7,9 +7,10 @@ package core
 
 import (
 	"fmt"
+	"runtime/debug"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"runtime/debug"
 )
 
 func MiddlewareRecover(logger *zap.Logger) gin.HandlerFunc {

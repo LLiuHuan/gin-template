@@ -19,6 +19,12 @@ type Failure struct {
 	Message string `json:"message"` // 描述信息
 }
 
+type Response struct {
+	Code int         `json:"code"`
+	Data interface{} `json:"data"`
+	Msg  string      `json:"message"`
+}
+
 const (
 	ServerError        = 10101
 	TooManyRequests    = 10102
@@ -43,6 +49,7 @@ const (
 	SocketSendError    = 10121
 
 	DBDriverNotExists = 10122
+	InitializedError  = 10123
 
 	AuthorizedCreateError    = 20101
 	AuthorizedListError      = 20102

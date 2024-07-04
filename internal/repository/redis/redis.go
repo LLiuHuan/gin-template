@@ -57,43 +57,48 @@ type Repo interface {
 
 type cacheRepo struct {
 	client redis.UniversalClient
+	ctx    context.Context
 }
 
 func New() (Repo, error) {
 	cfg := configs.Get().Redis
 
 	var client redis.UniversalClient
+	var err error
 
 	switch cfg.Mode {
 	case SimpleMode:
-		client = NewClient(cfg)
+		client, err = NewClient(cfg)
 	case FailoverMode:
-		client = NewFailoverClient(cfg)
+		client, err = NewFailoverClient(cfg)
 	case ClusterMode:
-		client = NewClusterClient(cfg)
+		client, err = NewClusterClient(cfg)
 	default:
 		panic("invalid redis mode")
 	}
 
-	// TODO: context
-	ctx := context.Background()
-	if err := client.Ping(ctx).Err(); err != nil {
+	if err != nil {
+		return nil, err
+	}
+
+	repo := &cacheRepo{
+		client: client,
+		ctx:    context.Background(),
+	}
+	if err := client.Ping(repo.ctx).Err(); err != nil {
 
 		return nil, errors.Wrap(err, "ping redis err")
 	}
 
-	return &cacheRepo{
-		client: client,
-	}, nil
+	return repo, nil
 }
 
 func (c *cacheRepo) i() {}
 
 // NewClient 默认使用Simple模式
-func NewClient(cfg configs.Redis) redis.UniversalClient {
+func NewClient(cfg configs.Redis) (redis.UniversalClient, error) {
 	if cfg.Addr == "" {
-		//elog.ErrorCtx(emptyCtx, eredis_config.PkgName, elog.FieldName(c.Name), elog.FieldError(fmt.Errorf(`invalid "addr" config, "addr" is empty but with stub mode"`)))
-		return nil
+		return nil, errors.New(`invalid "addr" config, "addr" is empty but with stub mode"`)
 	}
 	client := redis.NewClient(&redis.Options{
 		Addr:         cfg.Addr,
@@ -107,18 +112,16 @@ func NewClient(cfg configs.Redis) redis.UniversalClient {
 		MinIdleConns: cfg.MinIdleConns,
 		//IdleTimeout:  time.Duration(cfg.IdleTimeout) * time.Millisecond,
 	})
-	return client
+	return client, nil
 }
 
 // NewFailoverClient 创建哨兵模式
-func NewFailoverClient(cfg configs.Redis) redis.UniversalClient {
+func NewFailoverClient(cfg configs.Redis) (redis.UniversalClient, error) {
 	if len(cfg.Addrs) == 0 {
-		//elog.ErrorCtx(emptyCtx, `invalid "addrs" config, "addrs" has none addresses but with failover mode`, elog.FieldName(c.Name))
-		return nil
+		return nil, errors.New(`invalid "addrs" config, "addrs" has none addresses but with failover mode"`)
 	}
 	if cfg.MasterName == "" {
-		//elog.ErrorCtx(emptyCtx, `invalid "masterName" config, "masterName" is empty but with sentinel mode"`, elog.FieldName(c.Name))
-		return nil
+		return nil, errors.New(`invalid "master_name" config, "master_name" is empty but with failover mode"`)
 	}
 	failoverClient := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    cfg.MasterName,
@@ -131,16 +134,14 @@ func NewFailoverClient(cfg configs.Redis) redis.UniversalClient {
 		WriteTimeout:  time.Duration(cfg.WriteTimeout) * time.Millisecond,
 		PoolSize:      cfg.PoolSize,
 		MinIdleConns:  cfg.MinIdleConns,
-		//IdleTimeout:   time.Duration(cfg.IdleTimeout) * time.Millisecond,
 	})
-	return failoverClient
+	return failoverClient, nil
 }
 
 // NewClusterClient 集群模式
-func NewClusterClient(cfg configs.Redis) redis.UniversalClient {
+func NewClusterClient(cfg configs.Redis) (redis.UniversalClient, error) {
 	if len(cfg.Addrs) == 0 {
-		//elog.ErrorCtx(emptyCtx, "invalid addrs config, addrs has none addresses but with cluster mode", elog.FieldName(c.Name))
-		return nil
+		return nil, errors.New(`invalid "addrs" config, "addrs" has none addresses but with cluster mode"`)
 	}
 	clusterClient := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:        cfg.Addrs,
@@ -152,9 +153,8 @@ func NewClusterClient(cfg configs.Redis) redis.UniversalClient {
 		WriteTimeout: time.Duration(cfg.WriteTimeout) * time.Millisecond,
 		PoolSize:     cfg.PoolSize,
 		MinIdleConns: cfg.MinIdleConns,
-		//IdleTimeout:  time.Duration(cfg.IdleTimeout) * time.Millisecond,
 	})
-	return clusterClient
+	return clusterClient, nil
 }
 
 // Set set some <key,value> into redis
@@ -177,9 +177,7 @@ func (c *cacheRepo) Set(key, value string, ttl time.Duration, options ...Option)
 		f(opt)
 	}
 
-	// TODO: context
-	ctx := context.Background()
-	if err := c.client.Set(ctx, key, value, ttl).Err(); err != nil {
+	if err := c.client.Set(c.ctx, key, value, ttl).Err(); err != nil {
 		return errors.Wrapf(err, "redis set key: %s err", key)
 	}
 
@@ -204,9 +202,7 @@ func (c *cacheRepo) Get(key string, options ...Option) (string, error) {
 		f(opt)
 	}
 
-	// TODO: context
-	ctx := context.Background()
-	value, err := c.client.Get(ctx, key).Result()
+	value, err := c.client.Get(c.ctx, key).Result()
 	if err != nil {
 		return "", errors.Wrapf(err, "redis get key: %s err", key)
 	}
@@ -216,9 +212,7 @@ func (c *cacheRepo) Get(key string, options ...Option) (string, error) {
 
 // TTL get some key from redis
 func (c *cacheRepo) TTL(key string) (time.Duration, error) {
-	// TODO: context
-	ctx := context.Background()
-	ttl, err := c.client.TTL(ctx, key).Result()
+	ttl, err := c.client.TTL(c.ctx, key).Result()
 	if err != nil {
 		return -1, errors.Wrapf(err, "redis get key: %s err", key)
 	}
@@ -228,17 +222,13 @@ func (c *cacheRepo) TTL(key string) (time.Duration, error) {
 
 // Expire expire some key
 func (c *cacheRepo) Expire(key string, ttl time.Duration) bool {
-	// TODO: context
-	ctx := context.Background()
-	ok, _ := c.client.Expire(ctx, key, ttl).Result()
+	ok, _ := c.client.Expire(c.ctx, key, ttl).Result()
 	return ok
 }
 
 // ExpireAt expire some key at some time
 func (c *cacheRepo) ExpireAt(key string, ttl time.Time) bool {
-	// TODO: context
-	ctx := context.Background()
-	ok, _ := c.client.ExpireAt(ctx, key, ttl).Result()
+	ok, _ := c.client.ExpireAt(c.ctx, key, ttl).Result()
 	return ok
 }
 
@@ -246,9 +236,7 @@ func (c *cacheRepo) Exists(keys ...string) bool {
 	if len(keys) == 0 {
 		return true
 	}
-	// TODO: context
-	ctx := context.Background()
-	value, _ := c.client.Exists(ctx, keys...).Result()
+	value, _ := c.client.Exists(c.ctx, keys...).Result()
 	return value > 0
 }
 
@@ -273,9 +261,7 @@ func (c *cacheRepo) Del(key string, options ...Option) bool {
 		return true
 	}
 
-	// TODO: context
-	ctx := context.Background()
-	value, _ := c.client.Del(ctx, key).Result()
+	value, _ := c.client.Del(c.ctx, key).Result()
 	return value > 0
 }
 
@@ -295,9 +281,7 @@ func (c *cacheRepo) Incr(key string, options ...Option) int64 {
 	for _, f := range options {
 		f(opt)
 	}
-	// TODO: context
-	ctx := context.Background()
-	value, _ := c.client.Incr(ctx, key).Result()
+	value, _ := c.client.Incr(c.ctx, key).Result()
 	return value
 }
 
@@ -318,9 +302,7 @@ func WithTrace(t Trace) Option {
 
 // Version redis server version
 func (c *cacheRepo) Version() string {
-	// TODO: context
-	ctx := context.Background()
-	server := c.client.Info(ctx, "server").Val()
+	server := c.client.Info(c.ctx, "server").Val()
 	spl1 := strings.Split(server, "# Server")
 	spl2 := strings.Split(spl1[1], "redis_version:")
 	spl3 := strings.Split(spl2[1], "redis_git_sha1:")

@@ -29,6 +29,7 @@ var enUSText = map[int]string{
 	SocketSendError:    "Socket message sending failed",
 
 	DBDriverNotExists: "Database driver does not exist",
+	InitializedError:  "Already initialized",
 
 	AuthorizedCreateError:    "Failed to create caller",
 	AuthorizedListError:      "Failed to get caller list",

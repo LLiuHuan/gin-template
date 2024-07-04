@@ -5,12 +5,14 @@
 package core
 
 import (
-	"github.com/LLiuHuan/gin-template/configs"
-	"github.com/LLiuHuan/gin-template/internal/code"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/time/rate"
 	"net/http"
 	"time"
+
+	"github.com/LLiuHuan/gin-template/configs"
+	"github.com/LLiuHuan/gin-template/internal/code"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
 func MiddlewareLimit() gin.HandlerFunc {

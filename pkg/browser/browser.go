@@ -22,6 +22,9 @@ func Open(uri string) error {
 	if !ok {
 		return fmt.Errorf("don't know how to open things on %s platform", runtime.GOOS)
 	}
+	if len(uri) > 4 && uri[:4] != "http" {
+		uri = "http://" + uri
+	}
 	cmd := exec.Command(run, uri)
 	return cmd.Start()
 }

@@ -6,6 +6,7 @@ package router
 
 import (
 	"fmt"
+
 	"github.com/LLiuHuan/gin-template/internal/alert"
 	"github.com/LLiuHuan/gin-template/internal/metrics"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
@@ -14,6 +15,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/internal/router/interceptor"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
+
 	"go.uber.org/zap"
 )
 
@@ -44,7 +46,6 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 
 	//openBrowserUri := fmt.Sprintf("%s:%d", configs.Get().Project.Domain, configs.Get().Project.Port)
 
-	// TODO: 后续判断一下是否安装，如果没安装可以提示让跳转到初始化页面
 	//_, ok := file.IsExists(configs.ProjectInstallMark)
 	//if !ok { // 未安装
 	//	openBrowserUri += "/install"
@@ -94,13 +95,13 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	//setRenderRouter(r)
 
 	// 设置 API 路由
-	setApiRouter(r)
+	setApiV1Router(r)
 
 	// 设置 GraphQL 路由
 	//setGraphQLRouter(r)
 
 	// 设置 Socket 路由
-	//setSocketRouter(r)
+	setSocketRouter(r)
 
 	s := new(Server)
 	s.Mux = mux

@@ -138,6 +138,8 @@ type Context interface {
 
 	// ResponseWriter 获取 ResponseWriter 对象
 	ResponseWriter() gin.ResponseWriter
+
+	GetCtx() *gin.Context
 }
 
 // context 实现接口
@@ -421,6 +423,10 @@ func (c *context) RequestContext() StdContext {
 // ResponseWriter 获取 ResponseWriter
 func (c *context) ResponseWriter() gin.ResponseWriter {
 	return c.ctx.Writer
+}
+
+func (c *context) GetCtx() *gin.Context {
+	return c.ctx
 }
 
 // newContext 创建 Context

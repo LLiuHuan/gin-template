@@ -37,6 +37,8 @@ type TomlConfigInterf interface {
 	GetFloat64(keyName string) float64
 	GetDuration(keyName string) time.Duration
 	GetStringSlice(keyName string) []string
+	Set(keyName string, value any)
+	WriteConfig() error
 }
 
 type Config struct {
@@ -72,7 +74,7 @@ var (
 // init 初始化Viper，解析配置文件
 func init() {
 	lastChangeTime = time.Now()
-	configContainer = CreateYamlFactory()
+	configContainer = CreateTomlFactory()
 }
 
 func Get() *Config {
@@ -83,9 +85,9 @@ func GetContainer() TomlConfigInterf {
 	return configContainer
 }
 
-// CreateYamlFactory 创建一个yaml配置文件工厂
+// CreateTomlFactory 创建一个yaml配置文件工厂
 // 两种方式存储配置文件，一种是解析到结构体，一种是使用KV
-func CreateYamlFactory() TomlConfigInterf {
+func CreateTomlFactory() TomlConfigInterf {
 	containerFactory = CreateContainersFactory()
 
 	var r io.Reader
@@ -138,36 +140,36 @@ func CreateYamlFactory() TomlConfigInterf {
 		panic("配置文件初始化失败" + err.Error())
 	}
 
-	return &ymlConfig{
+	return &tomlConfig{
 		viper: v,
 		mu:    new(sync.Mutex),
 	}
 }
 
-type ymlConfig struct {
+type tomlConfig struct {
 	viper *viper.Viper
 	mu    *sync.Mutex
 }
 
 // ConfigFileChangeListen 监听文件变化
-func (y *ymlConfig) ConfigFileChangeListen() {
-	y.viper.OnConfigChange(func(changeEvent fsnotify.Event) {
+func (t *tomlConfig) ConfigFileChangeListen() {
+	t.viper.OnConfigChange(func(changeEvent fsnotify.Event) {
 		if time.Now().Sub(lastChangeTime).Seconds() >= 1 {
 			if changeEvent.Op.String() == "WRITE" {
-				y.clearCache()
+				t.clearCache()
 				lastChangeTime = time.Now()
 			}
 		}
 
-		if err := y.viper.Unmarshal(config); err != nil {
+		if err := t.viper.Unmarshal(config); err != nil {
 			panic(err)
 		}
 	})
-	y.viper.WatchConfig()
+	t.viper.WatchConfig()
 }
 
 // keyIsCache 判断相关键是否已经缓存
-func (y *ymlConfig) keyIsCache(keyName string) bool {
+func (t *tomlConfig) keyIsCache(keyName string) bool {
 	if _, exists := containerFactory.KeyIsExists(ConfigKeyPrefix + keyName); exists {
 		return true
 	} else {
@@ -176,10 +178,10 @@ func (y *ymlConfig) keyIsCache(keyName string) bool {
 }
 
 // 对键值进行缓存
-func (y *ymlConfig) cache(keyName string, value interface{}) (bool, error) {
+func (t *tomlConfig) cache(keyName string, value interface{}) (bool, error) {
 	// 避免缓存键、值时，程序提示键名已经被注册的日志输出
-	y.mu.Lock()
-	defer y.mu.Unlock()
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	if _, exists := containerFactory.KeyIsExists(ConfigKeyPrefix + keyName); exists {
 		return true, nil
 	}
@@ -187,20 +189,20 @@ func (y *ymlConfig) cache(keyName string, value interface{}) (bool, error) {
 }
 
 // 通过键获取缓存的值
-func (y *ymlConfig) getValueFromCache(keyName string) interface{} {
+func (t *tomlConfig) getValueFromCache(keyName string) interface{} {
 	return containerFactory.Get(ConfigKeyPrefix + keyName)
 }
 
 // 清空已经缓存的配置项信息
-func (y *ymlConfig) clearCache() {
+func (t *tomlConfig) clearCache() {
 	containerFactory.FuzzyDelete(ConfigKeyPrefix)
 }
 
 // Clone 允许 clone 一个相同功能的结构体
-func (y *ymlConfig) Clone(fileName string) TomlConfigInterf {
+func (t *tomlConfig) Clone(fileName string) TomlConfigInterf {
 	// 这里存在一个深拷贝，需要注意，避免拷贝的结构体操作对原始结构体造成影响
-	var ymlC = *y
-	var ymlConfViper = *(y.viper)
+	var ymlC = *t
+	var ymlConfViper = *(t.viper)
 	(&ymlC).viper = &ymlConfViper
 
 	(&ymlC).viper.SetConfigName(fileName)
@@ -212,103 +214,111 @@ func (y *ymlConfig) Clone(fileName string) TomlConfigInterf {
 }
 
 // Get 一个原始值
-func (y *ymlConfig) Get(keyName string) interface{} {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName)
+func (t *tomlConfig) Get(keyName string) interface{} {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName)
 	} else {
-		value := y.viper.Get(keyName)
-		y.cache(keyName, value)
+		value := t.viper.Get(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetString 字符串格式返回值
-func (y *ymlConfig) GetString(keyName string) string {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(string)
+func (t *tomlConfig) GetString(keyName string) string {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(string)
 	} else {
-		value := y.viper.GetString(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetString(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 
 }
 
 // GetBool 布尔格式返回值
-func (y *ymlConfig) GetBool(keyName string) bool {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(bool)
+func (t *tomlConfig) GetBool(keyName string) bool {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(bool)
 	} else {
-		value := y.viper.GetBool(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetBool(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetInt 整数格式返回值
-func (y *ymlConfig) GetInt(keyName string) int {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(int)
+func (t *tomlConfig) GetInt(keyName string) int {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(int)
 	} else {
-		value := y.viper.GetInt(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetInt(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetInt32 整数格式返回值
-func (y *ymlConfig) GetInt32(keyName string) int32 {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(int32)
+func (t *tomlConfig) GetInt32(keyName string) int32 {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(int32)
 	} else {
-		value := y.viper.GetInt32(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetInt32(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetInt64 整数格式返回值
-func (y *ymlConfig) GetInt64(keyName string) int64 {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(int64)
+func (t *tomlConfig) GetInt64(keyName string) int64 {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(int64)
 	} else {
-		value := y.viper.GetInt64(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetInt64(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetFloat64 小数格式返回值
-func (y *ymlConfig) GetFloat64(keyName string) float64 {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(float64)
+func (t *tomlConfig) GetFloat64(keyName string) float64 {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(float64)
 	} else {
-		value := y.viper.GetFloat64(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetFloat64(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetDuration 时间单位格式返回值
-func (y *ymlConfig) GetDuration(keyName string) time.Duration {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).(time.Duration)
+func (t *tomlConfig) GetDuration(keyName string) time.Duration {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).(time.Duration)
 	} else {
-		value := y.viper.GetDuration(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetDuration(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
 // GetStringSlice 字符串切片数格式返回值
-func (y *ymlConfig) GetStringSlice(keyName string) []string {
-	if y.keyIsCache(keyName) {
-		return y.getValueFromCache(keyName).([]string)
+func (t *tomlConfig) GetStringSlice(keyName string) []string {
+	if t.keyIsCache(keyName) {
+		return t.getValueFromCache(keyName).([]string)
 	} else {
-		value := y.viper.GetStringSlice(keyName)
-		y.cache(keyName, value)
+		value := t.viper.GetStringSlice(keyName)
+		t.cache(keyName, value)
 		return value
 	}
 }
 
-func (y *ymlConfig) i() {}
+func (t *tomlConfig) Set(keyName string, value any) {
+	t.viper.Set(keyName, value)
+}
+
+func (t *tomlConfig) WriteConfig() error {
+	return t.viper.WriteConfig()
+}
+
+func (t *tomlConfig) i() {}

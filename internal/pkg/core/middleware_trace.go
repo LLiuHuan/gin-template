@@ -7,18 +7,20 @@ package core
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
+	"runtime/debug"
+	"time"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/proposal"
 	"github.com/LLiuHuan/gin-template/pkg/env"
 	"github.com/LLiuHuan/gin-template/pkg/trace"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
-	"net/http"
-	"net/url"
-	"runtime/debug"
-	"time"
 )
 
 func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
@@ -134,9 +136,9 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 					multierr.AppendInto(&abortErr, err.StackError())
 					businessCode = err.BusinessCode()
 					businessCodeMsg = err.Message()
-					response = &code.Failure{
-						Code:    businessCode,
-						Message: businessCodeMsg,
+					response = &code.Response{
+						Code: businessCode,
+						Msg:  businessCodeMsg,
 					}
 					ctx.JSON(err.HTTPCode(), response)
 				}
@@ -146,7 +148,12 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 			// region 正确返回
 			response = context.getPayload()
 			if response != nil {
-				ctx.JSON(http.StatusOK, response)
+				// 返回数据格式
+				ctx.JSON(http.StatusOK, &code.Response{
+					Code: http.StatusOK,
+					Data: response,
+					Msg:  "success",
+				})
 			}
 			// endregion
 
