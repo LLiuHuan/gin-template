@@ -1,33 +1,40 @@
 package install
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"runtime"
+	"time"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/proposal/tablesqls"
 	"github.com/LLiuHuan/gin-template/internal/repository/socket"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cast"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	"net/http"
-	"os"
-	"runtime"
 )
 
 type installRequest struct {
-	Language  string `form:"language" `  // 语言包
-	RedisAddr string `form:"redis_addr"` // 连接地址，例如：127.0.0.1:6379
-	RedisPass string `form:"redis_pass"` // 连接密码
-	RedisDb   string `form:"redis_db"`   // 连接 db
+	Language  string `form:"language" json:"language"`     // 语言包
+	RedisAddr string `form:"redis_addr" json:"redis_addr"` // 连接地址，例如：127.0.0.1:6379
+	RedisPass string `form:"redis_pass" json:"redis_pass"` // 连接密码
+	RedisDb   int    `form:"redis_db" json:"redis_db"`     // 连接 db
+	RedisMode string `form:"redis_mode" json:"redis_mode"` // 连接模式，例如：simple、cluster、sentinel
 
-	MySQLHost string `form:"mysql_host"`
-	MySQLPort int    `form:"mysql_port"`
-	MySQLUser string `form:"mysql_user"`
-	MySQLPass string `form:"mysql_pass"`
-	MySQLName string `form:"mysql_name"`
+	IsOpenReadDB int    `form:"isOpenReadDB" json:"isOpenReadDB"` // 是否开启读写分离
+	DatabaseHost string `form:"database_host" json:"database_host"`
+	DatabasePort int    `form:"database_port" json:"database_port"`
+	DatabaseUser string `form:"database_user" json:"database_user"`
+	DatabasePass string `form:"database_pass" json:"database_pass"`
+	DatabaseName string `form:"database_name" json:"database_name"`
+	DatabaseMode string `form:"database_mode" json:"database_mode"`
 }
 
 type installResponse struct{}
@@ -76,9 +83,21 @@ func (h *handler) Install() core.HandlerFunc {
 
 	return func(ctx core.Context) {
 		server, err := socket.New(h.logger, h.db, h.cache, ctx.ResponseWriter(), ctx.Request(), nil)
-
 		req := new(installRequest)
-		if err := ctx.ShouldBindQuery(req); err != nil {
+
+		// 获取传过来的参数
+		//接收消息
+		_, message, err := server.ReadMessage()
+		if err != nil {
+			ctx.AbortWithError(core.Error(
+				http.StatusBadRequest,
+				code.ParamBindError,
+				code.Text(code.ParamBindError)).WithError(err),
+			)
+			return
+		}
+
+		if err = json.Unmarshal(message, &req); err != nil {
 			ctx.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
@@ -142,11 +161,11 @@ func (h *handler) Install() core.HandlerFunc {
 
 		// region 验证 MySQL 配置
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=%t&loc=%s",
-			req.MySQLUser,
-			req.MySQLPass,
-			req.MySQLHost,
-			req.MySQLPort,
-			req.MySQLName,
+			req.DatabaseUser,
+			req.DatabasePass,
+			req.DatabaseHost,
+			req.DatabasePort,
+			req.DatabaseName,
 			true,
 			"Local")
 
@@ -189,26 +208,33 @@ func (h *handler) Install() core.HandlerFunc {
 		config.Set("redis.addr", req.RedisAddr)
 		config.Set("redis.pass", req.RedisPass)
 		config.Set("redis.db", req.RedisDb)
-		config.Set("redis.mode", "simple")
+		config.Set("redis.mode", req.RedisMode)
 
-		config.Set("database.mode", "mysql")
-		config.Set("database.mysql.read.host", req.MySQLHost)
-		config.Set("database.mysql.read.port", req.MySQLPort)
-		config.Set("database.mysql.read.user", req.MySQLUser)
-		config.Set("database.mysql.read.pass", req.MySQLPass)
-		config.Set("database.mysql.read.name", req.MySQLName)
+		config.Set("database.mode", req.DatabaseMode)
+		dbMode := fmt.Sprintf("database.%s", req.DatabaseMode)
+		dbRead := dbMode + ".read"
+		dbWrite := dbMode + ".write"
+		dbBase := dbMode + ".base"
 
-		config.Set("database.mysql.write.host", req.MySQLHost)
-		config.Set("database.mysql.write.port", req.MySQLPort)
-		config.Set("database.mysql.write.user", req.MySQLUser)
-		config.Set("database.mysql.write.pass", req.MySQLPass)
-		config.Set("database.mysql.write.name", req.MySQLName)
+		config.Set(dbMode+"isOpenReadDB", req.IsOpenReadDB)
 
-		config.Set("database.mysql.base.host", req.MySQLHost)
-		config.Set("database.mysql.base.port", req.MySQLPort)
-		config.Set("database.mysql.base.user", req.MySQLUser)
-		config.Set("database.mysql.base.pass", req.MySQLPass)
-		config.Set("database.mysql.base.name", req.MySQLName)
+		config.Set(dbRead+".host", req.DatabaseHost)
+		config.Set(dbRead+".port", req.DatabasePort)
+		config.Set(dbRead+".user", req.DatabaseUser)
+		config.Set(dbRead+".pass", req.DatabasePass)
+		config.Set(dbRead+".name", req.DatabaseName)
+
+		config.Set(dbWrite+".host", req.DatabaseHost)
+		config.Set(dbWrite+".port", req.DatabasePort)
+		config.Set(dbWrite+".user", req.DatabaseUser)
+		config.Set(dbWrite+".pass", req.DatabasePass)
+		config.Set(dbWrite+".name", req.DatabaseName)
+
+		config.Set(dbBase+".host", req.DatabaseHost)
+		config.Set(dbBase+".port", req.DatabasePort)
+		config.Set(dbBase+".user", req.DatabaseUser)
+		config.Set(dbBase+".pass", req.DatabasePass)
+		config.Set(dbBase+".name", req.DatabaseName)
 		err = config.WriteConfig()
 		if err != nil {
 			fmt.Println(err)
@@ -259,6 +285,9 @@ func (h *handler) Install() core.HandlerFunc {
 						code.Text(code.MySQLExecError)).WithError(err),
 					)
 				}
+
+				// 有个延时状态
+				time.Sleep(300 * time.Microsecond)
 				// endregion
 
 				// region 初始化默认数据
@@ -273,6 +302,9 @@ func (h *handler) Install() core.HandlerFunc {
 					}
 
 					err = server.OnSend([]byte("初始化 MySQL 数据表：" + k + " 默认数据成功。"))
+
+					// 有个延时状态
+					time.Sleep(300 * time.Microsecond)
 					if err != nil {
 						ctx.AbortWithError(core.Error(
 							http.StatusInternalServerError,
@@ -298,6 +330,9 @@ func (h *handler) Install() core.HandlerFunc {
 		}
 		defer f.Close()
 		// endregion
+
+		// 有个延时状态
+		time.Sleep(time.Second)
 
 		err = server.OnSend([]byte("初始化成功。"))
 		if err != nil {

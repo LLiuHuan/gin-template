@@ -8,11 +8,12 @@ package kprocess
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
 )
 
 var _ KProcess = (*kProcess)(nil)

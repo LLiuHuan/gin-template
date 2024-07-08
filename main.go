@@ -7,15 +7,16 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/router"
 	"github.com/LLiuHuan/gin-template/pkg/env"
 	"github.com/LLiuHuan/gin-template/pkg/kprocess"
 	"github.com/LLiuHuan/gin-template/pkg/logger"
 	"github.com/LLiuHuan/gin-template/pkg/timeutil"
-	"net/http"
-	"os"
-	"time"
 )
 
 // 初始化执行

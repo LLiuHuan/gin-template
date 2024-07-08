@@ -10,11 +10,11 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"github.com/LLiuHuan/gin-template/pkg/timeutil"
 	"net/url"
 	"strings"
 
 	"github.com/LLiuHuan/gin-template/pkg/errors"
+	"github.com/LLiuHuan/gin-template/pkg/timeutil"
 )
 
 // Generate

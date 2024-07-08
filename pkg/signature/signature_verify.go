@@ -10,12 +10,12 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"github.com/LLiuHuan/gin-template/pkg/timeutil"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/LLiuHuan/gin-template/pkg/errors"
+	"github.com/LLiuHuan/gin-template/pkg/timeutil"
 )
 
 func (s *signature) Verify(authorization, date string, path string, method string, params url.Values) (ok bool, err error) {

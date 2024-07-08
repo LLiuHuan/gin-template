@@ -5,10 +5,10 @@
 package socket
 
 import (
-	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"net/http"
 	"time"
 
+	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
 
@@ -36,6 +36,15 @@ type Server interface {
 
 	// OnClose 关闭
 	OnClose()
+
+	// GetSocket 获取socket
+	GetSocket() *websocket.Conn
+
+	ReadMessage() (messageType int, p []byte, err error)
+
+	WriteMessage(messageType int, data []byte) error
+
+	WriteJSON(v interface{}) error
 }
 
 var upGrader = websocket.Upgrader{

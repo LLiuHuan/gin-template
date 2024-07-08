@@ -8,6 +8,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
+
 	"go.uber.org/zap"
 )
 

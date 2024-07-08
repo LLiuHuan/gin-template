@@ -63,6 +63,6 @@ port = 8087
 
 [redis]
 addr = '127.0.0.1:6379'
-db = '1'
+db = 1
 mode = 'simple'
 pass = 'bigdata'
