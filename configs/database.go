@@ -1,8 +1,9 @@
 // Package configs
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:32
-// @description: 数据库配置
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:32
+//	@description:	数据库配置
 package configs
 
 type DataBase struct {

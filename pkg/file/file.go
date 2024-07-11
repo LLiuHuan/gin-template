@@ -1,8 +1,9 @@
 // Package file
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:57
-// @description: 文件操作
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:57
+//	@description:	文件操作
 package file
 
 import (

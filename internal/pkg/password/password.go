@@ -27,7 +27,6 @@ func GeneratePassword(str string) (password string) {
 	h := hmac.New(sha256.New, []byte(saltPassword))
 	h.Write(mByte)
 	password = hex.EncodeToString(h.Sum(nil))
-
 	return
 }
 
@@ -41,7 +40,7 @@ func ResetPassword() (password string) {
 	return
 }
 
-func GenerateLoginToken(id int32) (token string) {
+func GenerateLoginToken(id int) (token string) {
 	m := md5.New()
 	m.Write([]byte(fmt.Sprintf("%d%s", id, saltPassword)))
 	token = hex.EncodeToString(m.Sum(nil))

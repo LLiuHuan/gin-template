@@ -1,10 +1,11 @@
 //go:build windows
 
 // Package color
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:55
-// @description: Windows颜色
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:55
+//	@description:	Windows颜色
 package color
 
 import (

@@ -1,8 +1,9 @@
 // Package interceptor
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-03 15:00
-// @description: 登录拦截器
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-03 15:00
+//	@description:	登录拦截器
 package interceptor
 
 import (

@@ -1,8 +1,9 @@
 // Package configs
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:33
-// @description: 报警配置
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:33
+//	@description:	报警配置
 package configs
 
 type Notify struct {

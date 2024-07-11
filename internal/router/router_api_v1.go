@@ -5,6 +5,7 @@
 package router
 
 import (
+	"github.com/LLiuHuan/gin-template/internal/api/admin"
 	"github.com/LLiuHuan/gin-template/internal/api/helper"
 	"github.com/LLiuHuan/gin-template/internal/api/tool"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
@@ -14,6 +15,7 @@ func setApiV1Router(r *resource) {
 	// helper
 	helperHandler := helper.New(r.logger, r.db, r.cache)
 	toolHandler := tool.New(r.logger, r.db, r.cache)
+	adminHandler := admin.New(r.logger, r.db, r.cache)
 
 	apiRouter := r.mux.Group("/api/v1")
 	{
@@ -41,16 +43,12 @@ func setApiV1Router(r *resource) {
 		//	}
 		//}
 	}
+	// 需要签名验证，无需登录验证，无需 RBAC 权限验证
+	login := r.mux.Group("/api/v1", r.interceptors.CheckSignature())
+	{
+		login.POST("/login", adminHandler.Login())
+	}
 
-	//// admin
-	//adminHandler := admin.New(r.logger, r.db, r.cache)
-	//
-	//// 需要签名验证，无需登录验证，无需 RBAC 权限验证
-	//login := r.mux.Group("/api", r.interceptors.CheckSignature())
-	//{
-	//	login.POST("/login", adminHandler.Login())
-	//}
-	//
 	//// 需要签名验证、登录验证，无需 RBAC 权限验证
 	//notRBAC := r.mux.Group("/api", core.WrapAuthHandler(r.interceptors.CheckLogin), r.interceptors.CheckSignature())
 	//{

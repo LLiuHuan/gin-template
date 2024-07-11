@@ -1,8 +1,9 @@
 // Package proposal
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:41
-// @description: 指标信息
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:41
+//	@description:	指标信息
 package proposal
 
 import "encoding/json"

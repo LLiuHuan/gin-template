@@ -1,7 +1,8 @@
 // Package database
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-03 10:19
+//
+//	@program:	gin-template
+//	@author:	[lliuhuan](https://github.com/lliuhuan)
+//	@create:	2024-07-03 10:19
 package database
 
 import (
@@ -231,8 +232,9 @@ func structHasSpecialField(fieldName string, anyStructPtr interface{}) (bool, st
 }
 
 // getColumnNameFromGormTag 从 gorm 标签中获取字段名
-// @defaultColumn 如果没有 gorm：column 标签为字段重命名，则使用默认字段名
-// @TagValue 字段中含有的gorm："column:created_at" 标签值，可能的格式：1. column:created_at    、2. default:null;  column:created_at  、3.  column:created_at; default:null
+//
+//	@defaultColumn	如果没有 gorm：column 标签为字段重命名，则使用默认字段名
+//	@TagValue		字段中含有的gorm："column:created_at" 标签值，可能的格式：1. column:created_at    、2. default:null;  column:created_at  、3.  column:created_at; default:null
 func getColumnNameFromGormTag(defaultColumn, TagValue string) (str string) {
 	pos1 := strings.Index(TagValue, "column:")
 	if pos1 == -1 {

@@ -1,8 +1,9 @@
 // Package core
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-03 17:28
-// @description: 跨域请求处理
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-03 17:28
+//	@description:	跨域请求处理
 package core
 
 import (

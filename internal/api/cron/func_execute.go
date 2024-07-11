@@ -19,15 +19,16 @@ type executeResponse struct {
 }
 
 // Execute 手动执行任务
-// @Summary 手动执行任务
-// @Description 手动执行任务
-// @Tags API.cron
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body executeRequest true "请求信息"
-// @Success 200 {object} executeResponse
-// @Failure 400 {object} code.Failure
-// @Router /api/cron/exec/{id} [patch]
+//
+//	@Summary		手动执行任务
+//	@Description	手动执行任务
+//	@Tags			API.cron
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		executeRequest	true	"请求信息"
+//	@Success		200		{object}	executeResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/api/cron/exec/{id} [patch]
 func (h *handler) Execute() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(executeRequest)

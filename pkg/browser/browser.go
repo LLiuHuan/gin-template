@@ -1,8 +1,9 @@
 // Package browser
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:53
-// @description: 使用浏览器打开指定的 URL
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:53
+//	@description:	使用浏览器打开指定的 URL
 package browser
 
 import (

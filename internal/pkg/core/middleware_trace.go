@@ -1,8 +1,9 @@
 // Package core
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-03 17:34
-// @description: 链路追踪
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-03 17:34
+//	@description:	链路追踪
 package core
 
 import (

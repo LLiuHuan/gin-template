@@ -1,8 +1,9 @@
 // Package alert
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 22:40
-// @description: 告警通知
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 22:40
+//	@description:	告警通知
 package alert
 
 import (

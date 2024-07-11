@@ -1,8 +1,9 @@
 // Package core
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-03 17:31
-// @description: 恢复panic
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-03 17:31
+//	@description:	恢复panic
 package core
 
 import (

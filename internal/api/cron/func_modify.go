@@ -28,19 +28,20 @@ type modifyRequest struct {
 }
 
 type modifyResponse struct {
-	Id int32 `json:"id"` // 主键ID
+	Id int `json:"id"` // 主键ID
 }
 
 // Modify 编辑任务
-// @Summary 编辑任务
-// @Description 编辑任务
-// @Tags API.cron
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body modifyRequest true "请求信息"
-// @Success 200 {object} modifyResponse
-// @Failure 400 {object} code.Failure
-// @Router /api/cron/{id} [post]
+//
+//	@Summary		编辑任务
+//	@Description	编辑任务
+//	@Tags			API.cron
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		modifyRequest	true	"请求信息"
+//	@Success		200		{object}	modifyResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/api/cron/{id} [post]
 func (h *handler) Modify() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(modifyRequest)
@@ -64,7 +65,7 @@ func (h *handler) Modify() core.HandlerFunc {
 			return
 		}
 
-		id := int32(ids[0])
+		id := int(ids[0])
 
 		modifyData := new(cron.ModifyCronTaskData)
 		modifyData.Name = req.Name

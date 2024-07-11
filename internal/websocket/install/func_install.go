@@ -40,15 +40,16 @@ type installRequest struct {
 type installResponse struct{}
 
 // Install 安装
-// @Summary 安装
-// @Description 安装
-// @Tags API.install
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body installRequest true "请求信息"
-// @Success 200 {object} installResponse
-// @Failure 400 {object} code.Failure
-// @Router /v1/api/install [post]
+//
+//	@Summary		安装
+//	@Description	安装
+//	@Tags			API.install
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		installRequest	true	"请求信息"
+//	@Success		200		{object}	installResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/v1/api/install [post]
 func (h *handler) Install() core.HandlerFunc {
 	installTableList := map[string]map[string]string{
 		"authorized": {

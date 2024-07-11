@@ -54,15 +54,16 @@ type listResponse struct {
 }
 
 // List 任务列表
-// @Summary 任务列表
-// @Description 任务列表
-// @Tags API.cron
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body listRequest true "请求信息"
-// @Success 200 {object} listResponse
-// @Failure 400 {object} code.Failure
-// @Router /api/cron [get]
+//
+//	@Summary		任务列表
+//	@Description	任务列表
+//	@Tags			API.cron
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		listRequest	true	"请求信息"
+//	@Success		200		{object}	listResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/api/cron [get]
 func (h *handler) List() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(listRequest)

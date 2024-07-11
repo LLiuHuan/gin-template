@@ -20,15 +20,16 @@ type md5Response struct {
 }
 
 // Md5 加密
-// @Summary 加密
-// @Description 加密
-// @Tags Helper
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body md5Request true "请求信息"
-// @Success 200 {object} md5Response
-// @Failure 400 {object} code.Failure
-// @Router /helper/md5/{str} [get]
+//
+//	@Summary		加密
+//	@Description	加密
+//	@Tags			Helper
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		md5Request	true	"请求信息"
+//	@Success		200		{object}	md5Response
+//	@Failure		400		{object}	code.Failure
+//	@Router			/helper/md5/{str} [get]
 func (h *handler) Md5() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(md5Request)

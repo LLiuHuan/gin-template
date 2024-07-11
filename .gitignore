@@ -28,6 +28,7 @@ tmp/*
 # Project runtime log
 logs/*.log
 
-docs
+docs/docs.go
+docs/swagger.*
 
 INSTALL.lock

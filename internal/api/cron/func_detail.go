@@ -33,15 +33,16 @@ type detailResponse struct {
 }
 
 // Detail 获取单条任务详情
-// @Summary 获取单条任务详情
-// @Description 获取单条任务详情
-// @Tags API.cron
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body detailRequest true "请求信息"
-// @Success 200 {object} detailResponse
-// @Failure 400 {object} code.Failure
-// @Router /api/cron/{id} [get]
+//
+//	@Summary		获取单条任务详情
+//	@Description	获取单条任务详情
+//	@Tags			API.cron
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		detailRequest	true	"请求信息"
+//	@Success		200		{object}	detailResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/api/cron/{id} [get]
 func (h *handler) Detail() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(detailRequest)

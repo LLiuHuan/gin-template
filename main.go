@@ -1,7 +1,8 @@
 // Package gin_template
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 18:07
+//
+//	@program:	gin-template
+//	@author:	[lliuhuan](https://github.com/lliuhuan)
+//	@create:	2024-07-02 18:07
 package main
 
 import (
@@ -25,20 +26,20 @@ func init() {
 
 }
 
-// @title swagger 接口文档
-// @version 2.0
-// @description
+//	@title		swagger 接口文档
+//	@version	2.0
+//	@description
 
-// @contact.name
-// @contact.url
-// @contact.email
+//	@contact.name
+//	@contact.url
+//	@contact.email
 
-// @license.name MIT
-// @license.url https://github.com/LLiuHuan/gin-template/blob/master/LICENSE
+//	@license.name	MIT
+//	@license.url	https://github.com/LLiuHuan/gin-template/blob/master/LICENSE
 
-// @securityDefinitions.apikey  LoginToken
-// @in                          header
-// @name                        token
+// @securityDefinitions.apikey	LoginToken
+// @in							header
+// @name						token
 func main() {
 	accessLogger, err := logger.NewJSONLogger(
 		logger.WithDisableConsole(),

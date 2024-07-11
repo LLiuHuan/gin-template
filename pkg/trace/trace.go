@@ -1,8 +1,9 @@
 // Package trace
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 21:40
-// @description: 链路追踪
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 21:40
+//	@description:	链路追踪
 package trace
 
 import (

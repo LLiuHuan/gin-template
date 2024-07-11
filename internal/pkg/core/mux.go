@@ -1,8 +1,9 @@
 // Package core
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-03 14:36
-// @description: 多路复用器
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-03 14:36
+//	@description:	多路复用器
 package core
 
 import (

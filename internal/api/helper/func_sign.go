@@ -25,15 +25,16 @@ type signResponse struct {
 }
 
 // Sign 签名
-// @Summary 签名
-// @Description 签名
-// @Tags Helper
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body signRequest true "请求信息"
-// @Success 200 {object} signResponse
-// @Failure 400 {object} code.Failure
-// @Router /helper/sign [post]
+//
+//	@Summary		签名
+//	@Description	签名
+//	@Tags			Helper
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		signRequest	true	"请求信息"
+//	@Success		200		{object}	signResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/helper/sign [post]
 func (h *handler) Sign() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(signRequest)

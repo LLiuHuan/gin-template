@@ -31,15 +31,16 @@ type createResponse struct {
 }
 
 // Create 创建任务
-// @Summary 创建任务
-// @Description 创建任务
-// @Tags API.cron
-// @Accept application/x-www-form-urlencoded
-// @Produce json
-// @Param Request body createRequest true "请求信息"
-// @Success 200 {object} createResponse
-// @Failure 400 {object} code.Failure
-// @Router /api/cron [post]
+//
+//	@Summary		创建任务
+//	@Description	创建任务
+//	@Tags			API.cron
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		json
+//	@Param			Request	body		createRequest	true	"请求信息"
+//	@Success		200		{object}	createResponse
+//	@Failure		400		{object}	code.Failure
+//	@Router			/api/cron [post]
 func (h *handler) Create() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(createRequest)

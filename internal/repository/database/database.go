@@ -6,6 +6,7 @@ package database
 
 import (
 	"fmt"
+	"gorm.io/gorm/schema"
 	"strings"
 	"time"
 
@@ -110,6 +111,9 @@ func getDBDriver(mode string, isOpenReadDB int) (*gorm.DB, error) {
 	gormDB, err := gorm.Open(dialector, &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -183,7 +187,7 @@ func getDsn(sqlType string, readWrite string) string {
 		if Charset == "" {
 			Charset = "utf8mb4"
 		}
-		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=false&loc=Local", User, Pass, Host, Port, DataBase, Charset)
+		return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local", User, Pass, Host, Port, DataBase, Charset)
 	case "sqlserver", "mssql":
 		return fmt.Sprintf("server=%s;port=%d;database=%s;user id=%s;password=%s;encrypt=disable", Host, Port, DataBase, User, Pass)
 	case "postgresql", "postgre", "postgres":

@@ -1,8 +1,9 @@
 // Package metrics
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 22:45
-// @description: 指标
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 22:45
+//	@description:	指标
 package metrics
 
 import (

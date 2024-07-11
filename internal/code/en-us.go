@@ -1,8 +1,9 @@
 // Package code
-// @program: gin-template
-// @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 22:43
-// @description: 英文错误码
+//
+//	@program:		gin-template
+//	@author:		[lliuhuan](https://github.com/lliuhuan)
+//	@create:		2024-07-02 22:43
+//	@description:	英文错误码
 package code
 
 var enUSText = map[int]string{

@@ -5,6 +5,7 @@
 package validation
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/LLiuHuan/gin-template/configs"
@@ -22,7 +23,6 @@ var trans ut.Translator
 
 func init() {
 	lang := configs.Get().Project.Local
-	fmt.Println(lang, lang == configs.ZhCN)
 	if lang == configs.ZhCN {
 		trans, _ = ut.New(zh.New()).GetTranslator("zh")
 		if err := zhTranslation.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), trans); err != nil {
@@ -38,13 +38,22 @@ func init() {
 	}
 }
 
-func Error(err error) (message string) {
-	if validationErrors, ok := err.(validator.ValidationErrors); !ok {
+func validationError(err error) string {
+	var message string
+	var validationErrors validator.ValidationErrors
+	if !errors.As(err, &validationErrors) {
 		return err.Error()
-	} else {
-		for _, e := range validationErrors {
-			message += e.Translate(trans) + ";"
-		}
+	}
+	for _, e := range validationErrors {
+		message += e.Translate(trans) + ";"
 	}
 	return message
+}
+
+func ErrorE(err error) error {
+	return errors.New(validationError(err))
+}
+
+func Error(err error) (message string) {
+	return validationError(err)
 }
