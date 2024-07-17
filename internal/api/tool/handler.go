@@ -8,7 +8,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
-	"github.com/LLiuHuan/gin-template/pkg/hash"
+	"github.com/LLiuHuan/gin-template/pkg/hashids"
 
 	"go.uber.org/zap"
 )
@@ -68,7 +68,7 @@ type handler struct {
 	logger  *zap.Logger
 	db      database.Repo
 	cache   redis.Repo
-	hashids hash.Hash
+	hashids hashids.Hash
 }
 
 func New(logger *zap.Logger, db database.Repo, cache redis.Repo) Handler {

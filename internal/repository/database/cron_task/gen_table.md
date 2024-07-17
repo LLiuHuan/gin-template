@@ -1,4 +1,4 @@
-#### gin-template.cron_task 
+#### gin_template.cron_task 
 后台任务表
 
 | 序号 | 名称 | 描述 | 类型 | 键 | 为空 | 额外 | 默认值 |

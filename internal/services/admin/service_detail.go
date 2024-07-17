@@ -20,7 +20,6 @@ type SearchOneData struct {
 }
 
 func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (info *admin.Admin, err error) {
-
 	qb := admin.NewQueryBuilder()
 	qb.WhereIsDeleted(database.EqualPredicate, -1)
 

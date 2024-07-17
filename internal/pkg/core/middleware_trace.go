@@ -54,18 +54,18 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 
 		ts := time.Now()
 
-		context := newContext(ctx)
-		defer releaseContext(context)
+		c := newContext(ctx)
+		defer releaseContext(c)
 
-		context.init()
-		context.setLogger(logger)
-		context.ableRecordMetrics()
+		c.init()
+		c.setLogger(logger)
+		c.ableRecordMetrics()
 
 		if !withoutTracePaths[ctx.Request.URL.Path] {
-			if traceId := context.GetHeader(trace.Header); traceId != "" {
-				context.setTrace(trace.NewTrace(traceId))
+			if traceId := c.GetHeader(trace.Header); traceId != "" {
+				c.setTrace(trace.NewTrace(traceId))
 			} else {
-				context.setTrace(trace.NewTrace(""))
+				c.setTrace(trace.NewTrace(""))
 			}
 		}
 
@@ -79,8 +79,8 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 				graphResponse   interface{}
 			)
 
-			if ct := context.Trace(); ct != nil {
-				context.SetHeader(trace.Header, ct.ID())
+			if ct := c.Trace(); ct != nil {
+				c.SetHeader(trace.Header, ct.ID())
 				traceId = ct.ID()
 			}
 
@@ -88,7 +88,7 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 			if err := recover(); err != nil {
 				stackInfo := string(debug.Stack())
 				logger.Error("got panic", zap.String("panic", fmt.Sprintf("%+v", err)), zap.String("stack", stackInfo))
-				context.AbortWithError(Error(
+				c.AbortWithError(Error(
 					http.StatusInternalServerError,
 					code.ServerError,
 					code.Text(code.ServerError)),
@@ -99,9 +99,9 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 						ProjectName:  configs.ProjectName,
 						Env:          env.Active().Value(),
 						TraceID:      traceId,
-						HOST:         context.Host(),
-						URI:          context.URI(),
-						Method:       context.Method(),
+						HOST:         c.Host(),
+						URI:          c.URI(),
+						Method:       c.Method(),
 						ErrorMessage: err,
 						ErrorStack:   stackInfo,
 						Timestamp:    time.Now(),
@@ -116,7 +116,7 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 					multierr.AppendInto(&abortErr, ctx.Errors[i])
 				}
 
-				if err := context.abortError(); err != nil { // customer err
+				if err := c.abortError(); err != nil { // customer err
 					// 判断是否需要发送告警通知
 					if err.IsAlert() {
 						if notifyHandler := opt.alertNotify; notifyHandler != nil {
@@ -124,9 +124,9 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 								ProjectName:  configs.ProjectName,
 								Env:          env.Active().Value(),
 								TraceID:      traceId,
-								HOST:         context.Host(),
-								URI:          context.URI(),
-								Method:       context.Method(),
+								HOST:         c.Host(),
+								URI:          c.URI(),
+								Method:       c.Method(),
 								ErrorMessage: err.Message(),
 								ErrorStack:   fmt.Sprintf("%+v", err.StackError()),
 								Timestamp:    time.Now(),
@@ -147,7 +147,7 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 			// endregion
 
 			// region 正确返回
-			response = context.getPayload()
+			response = c.getPayload()
 			if response != nil {
 				// 返回数据格式
 				ctx.JSON(http.StatusOK, &code.Response{
@@ -159,9 +159,9 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 			// endregion
 
 			// region 记录指标
-			if opt.recordHandler != nil && context.isRecordMetrics() {
-				path := context.Path()
-				if alias := context.Alias(); alias != "" {
+			if opt.recordHandler != nil && c.isRecordMetrics() {
+				path := c.Path()
+				if alias := c.Alias(); alias != "" {
 					path = alias
 				}
 
@@ -169,9 +169,9 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 					ProjectName:  configs.ProjectName,
 					Env:          env.Active().Value(),
 					TraceID:      traceId,
-					HOST:         context.Host(),
+					HOST:         c.Host(),
 					Path:         path,
-					Method:       context.Method(),
+					Method:       c.Method(),
 					HTTPCode:     ctx.Writer.Status(),
 					BusinessCode: businessCode,
 					CostSeconds:  time.Since(ts).Seconds(),
@@ -182,7 +182,7 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 
 			// region 记录日志
 			var t *trace.Trace
-			if x := context.Trace(); x != nil {
+			if x := c.Trace(); x != nil {
 				t = x.(*trace.Trace)
 			} else {
 				return
@@ -203,7 +203,7 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 				Method:     ctx.Request.Method,
 				DecodedURL: decodedURL,
 				Header:     traceHeader,
-				Body:       string(context.RawData()),
+				Body:       string(c.RawData()),
 			})
 
 			var responseBody interface{}
@@ -212,7 +212,7 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 				responseBody = response
 			}
 
-			graphResponse = context.getGraphPayload()
+			graphResponse = c.getGraphPayload()
 			if graphResponse != nil {
 				responseBody = graphResponse
 			}

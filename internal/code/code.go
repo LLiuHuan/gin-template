@@ -51,6 +51,10 @@ const (
 	DBDriverNotExists = 10122
 	InitializedError  = 10123
 
+	ReadFileError       = 10124
+	FileIncompleteError = 10125
+	MkdirError          = 10126
+
 	AuthorizedCreateError    = 20101
 	AuthorizedListError      = 20102
 	AuthorizedDeleteError    = 20103

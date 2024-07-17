@@ -8,6 +8,7 @@ import (
 	"bytes"
 	stdctx "context"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strings"
@@ -35,7 +36,7 @@ const (
 
 // contextPool context池
 var contextPool = &sync.Pool{
-	New: func() interface{} {
+	New: func() any {
 		return new(context)
 	},
 }
@@ -51,24 +52,29 @@ type Context interface {
 
 	// ShouldBindQuery 反序列化 querystring
 	// tag: `form:"xxx"` (注：不要写成 query)
-	ShouldBindQuery(obj interface{}) error
+	ShouldBindQuery(obj any) error
 
 	// ShouldBindPostForm 反序列化 postform (querystring会被忽略)
 	// tag: `form:"xxx"`
-	ShouldBindPostForm(obj interface{}) error
+	ShouldBindPostForm(obj any) error
 
 	// ShouldBindForm 同时反序列化 querystring 和 postform;
 	// 当 querystring 和 postform 存在相同字段时，postform 优先使用。
 	// tag: `form:"xxx"`
-	ShouldBindForm(obj interface{}) error
+	ShouldBindForm(obj any) error
+
+	// FormFile 获取上传文件
+	FormFile(key string) (multipart.File, *multipart.FileHeader, error)
 
 	// ShouldBindJSON 反序列化 postjson
 	// tag: `json:"xxx"`
-	ShouldBindJSON(obj interface{}) error
+	ShouldBindJSON(obj any) error
 
 	// ShouldBindURI 反序列化 path 参数(如路由路径为 /user/:name)
 	// tag: `uri:"xxx"`
-	ShouldBindURI(obj interface{}) error
+	ShouldBindURI(obj any) error
+
+	ShouldBind(obj any) error
 
 	// Redirect 重定向
 	Redirect(code int, location string)
@@ -83,15 +89,15 @@ type Context interface {
 	setLogger(logger *zap.Logger)
 
 	// Payload 正确返回
-	Payload(payload interface{})
-	getPayload() interface{}
+	Payload(payload any)
+	getPayload() any
 
 	// GraphPayload GraphQL返回值 与 api 返回结构不同
-	GraphPayload(payload interface{})
-	getGraphPayload() interface{}
+	GraphPayload(payload any)
+	getGraphPayload() any
 
 	// HTML 返回界面
-	HTML(name string, obj interface{})
+	HTML(name string, obj any)
 
 	// AbortWithError 错误返回
 	AbortWithError(err BusinessError)
@@ -166,33 +172,42 @@ func (c *context) init() {
 
 // ShouldBindQuery 反序列化querystring
 // tag: `form:"xxx"` (注：不要写成query)
-func (c *context) ShouldBindQuery(obj interface{}) error {
+func (c *context) ShouldBindQuery(obj any) error {
 	return c.ctx.ShouldBindWith(obj, binding.Query)
 }
 
 // ShouldBindPostForm 反序列化 postform (querystring 会被忽略)
 // tag: `form:"xxx"`
-func (c *context) ShouldBindPostForm(obj interface{}) error {
+func (c *context) ShouldBindPostForm(obj any) error {
 	return c.ctx.ShouldBindWith(obj, binding.FormPost)
 }
 
 // ShouldBindForm 同时反序列化querystring和postform;
 // 当querystring和postform存在相同字段时，postform优先使用。
 // tag: `form:"xxx"`
-func (c *context) ShouldBindForm(obj interface{}) error {
+func (c *context) ShouldBindForm(obj any) error {
 	return c.ctx.ShouldBindWith(obj, binding.Form)
+}
+
+func (c *context) FormFile(key string) (multipart.File, *multipart.FileHeader, error) {
+	return c.ctx.Request.FormFile(key)
 }
 
 // ShouldBindJSON 反序列化postjson
 // tag: `json:"xxx"`
-func (c *context) ShouldBindJSON(obj interface{}) error {
+func (c *context) ShouldBindJSON(obj any) error {
 	return c.ctx.ShouldBindWith(obj, binding.JSON)
 }
 
 // ShouldBindURI 反序列化path参数(如路由路径为 /user/:name)
 // tag: `uri:"xxx"`
-func (c *context) ShouldBindURI(obj interface{}) error {
+func (c *context) ShouldBindURI(obj any) error {
 	return c.ctx.ShouldBindUri(obj)
+}
+
+// ShouldBind 反序列化
+func (c *context) ShouldBind(obj any) error {
+	return c.ctx.ShouldBind(obj)
 }
 
 // Redirect 重定向
@@ -236,7 +251,7 @@ func (c *context) setLogger(logger *zap.Logger) {
 }
 
 // getPayload 获取 Payload
-func (c *context) getPayload() interface{} {
+func (c *context) getPayload() any {
 	if payload, ok := c.ctx.Get(_PayloadName); ok != false {
 		return payload
 	}
@@ -244,12 +259,12 @@ func (c *context) getPayload() interface{} {
 }
 
 // Payload 设置 Payload
-func (c *context) Payload(payload interface{}) {
+func (c *context) Payload(payload any) {
 	c.ctx.Set(_PayloadName, payload)
 }
 
 // getGraphPayload 获取 GraphPayload
-func (c *context) getGraphPayload() interface{} {
+func (c *context) getGraphPayload() any {
 	if payload, ok := c.ctx.Get(_GraphPayloadName); ok != false {
 		return payload
 	}
@@ -257,12 +272,12 @@ func (c *context) getGraphPayload() interface{} {
 }
 
 // GraphPayload 设置 GraphPayload
-func (c *context) GraphPayload(payload interface{}) {
+func (c *context) GraphPayload(payload any) {
 	c.ctx.Set(_GraphPayloadName, payload)
 }
 
 // HTML 渲染模板
-func (c *context) HTML(name string, obj interface{}) {
+func (c *context) HTML(name string, obj any) {
 	c.ctx.HTML(200, name+".html", obj)
 }
 

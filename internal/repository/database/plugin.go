@@ -36,7 +36,7 @@ func (op *TracePlugin) Initialize(db *gorm.DB) (err error) {
 	// https://github.com/go-gorm/gorm/issues/3789  此 issue 所反映的问题就是我们本次解决掉的
 	_ = db.Callback().Query().Before("gorm:query").Register("disable_raise_record_not_found", maskNotDataError)
 
-	// 开始前
+	// 开始前 - 并不是都用相同的方法，可以自己自定义
 	_ = db.Callback().Query().Before("gorm:query").Register(callBackBeforeName, before)
 	_ = db.Callback().Delete().Before("gorm:before_delete").Register(callBackBeforeName, before)
 	_ = db.Callback().Update().Before("gorm:setup_reflect_value").Register(callBackBeforeName, before)
@@ -45,13 +45,13 @@ func (op *TracePlugin) Initialize(db *gorm.DB) (err error) {
 	// https://github.com/go-gorm/gorm/issues/4838
 	_ = db.Callback().Create().Before("gorm:before_create").Register(callBackBeforeName, createBeforeHook)
 	// 为了完美支持gorm的一系列回调函数
-	//_ = db.Callback().Update().Before("gorm:before_update").Register(callBackBeforeName, updateBeforeHook)
+	_ = db.Callback().Update().Before("gorm:before_update").Register(callBackBeforeName, updateBeforeHook)
 
-	// 结束后
+	// 结束后 - 并不是都用相同的方法，可以自己自定义
 	_ = db.Callback().Create().After("gorm:after_create").Register(callBackAfterName, after)
 	_ = db.Callback().Query().After("gorm:after_query").Register(callBackAfterName, after)
 	_ = db.Callback().Delete().After("gorm:after_delete").Register(callBackAfterName, after)
-	_ = db.Callback().Update().After("gorm:after_update").Register(callBackAfterName, after)
+	//_ = db.Callback().Update().After("gorm:after_update").Register(callBackAfterName, after)
 	_ = db.Callback().Row().After("gorm:row").Register(callBackAfterName, after)
 	_ = db.Callback().Raw().After("gorm:raw").Register(callBackAfterName, after)
 	return
@@ -59,11 +59,13 @@ func (op *TracePlugin) Initialize(db *gorm.DB) (err error) {
 
 var _ gorm.Plugin = &TracePlugin{}
 
+// before 在执行前，记录开始时间
 func before(db *gorm.DB) {
 	db.InstanceSet(startTime, time.Now())
 	return
 }
 
+// after 在执行后，记录结束时间，以及执行的 SQL 语句，并将其保存到 Trace 中
 func after(db *gorm.DB) {
 	_ctx := db.Statement.Context
 	ctx, ok := _ctx.(core.StdContext)
@@ -97,6 +99,7 @@ func after(db *gorm.DB) {
 	return
 }
 
+// maskNotDataError 屏蔽 gorm v2 包中会爆出的错误，正常没有数据会抛出异常，但是感觉不合理，没什么必要
 func maskNotDataError(db *gorm.DB) {
 	db.Statement.RaiseErrorOnNotFound = false
 }
@@ -150,30 +153,31 @@ func createBeforeHook(db *gorm.DB) {
 	}
 }
 
-//// updateBeforeHook
-//// InterceptUpdatePramsNotPtrError 拦截 save、update 函数参数如果是非指针类型的错误
-//// 对于开发者来说，以结构体形式更新数，只需要在 update 、save 函数的参数前面添加 & 即可
-//// 最终就可以完美兼支持、兼容 gorm 的所有回调函数
-//// 但是如果是指定字段更新，例如： UpdateColumn 函数则只传递值即可，不需要做校验
-//func updateBeforeHook(db *gorm.DB) {
-//	if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Struct {
-//		//_ = db.AddError(errors.New(my_errors.ErrorsGormDBUpdateParamsNotPtr))
-//		//variable.ZapLog.Warn(my_errors.ErrorsGormDBUpdateParamsNotPtr)
-//	} else if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Map {
-//		// 如果是调用了 gorm.Update 、updates 函数 , 在参数没有传递指针的情况下，无法触发回调函数
-//
-//	} else if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Ptr && reflect.ValueOf(db.Statement.Dest).Elem().Kind() == reflect.Struct {
-//		// 参数校验无错误自动设置 UpdatedAt
-//		if b, column := structHasSpecialField("UpdatedAt", db.Statement.Dest); b {
-//			db.Statement.SetColumn(column, time.Now().Format(timeutil.CSTLayout))
-//		}
-//	} else if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Ptr && reflect.ValueOf(db.Statement.Dest).Elem().Kind() == reflect.Map {
-//		if b, column := structHasSpecialField("updated_at", db.Statement.Dest); b {
-//			destValueOf := reflect.ValueOf(db.Statement.Dest).Elem()
-//			destValueOf.SetMapIndex(reflect.ValueOf(column), reflect.ValueOf(time.Now().Format(timeutil.CSTLayout)))
-//		}
-//	}
-//}
+// updateBeforeHook
+// InterceptUpdatePramsNotPtrError 拦截 save、update 函数参数如果是非指针类型的错误
+// 对于开发者来说，以结构体形式更新数，只需要在 update 、save 函数的参数前面添加 & 即可
+// 最终就可以完美兼支持、兼容 gorm 的所有回调函数
+// 但是如果是指定字段更新，例如： UpdateColumn 函数则只传递值即可，不需要做校验
+func updateBeforeHook(db *gorm.DB) {
+	if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Struct {
+		//_ = db.AddError(errors.New(my_errors.ErrorsGormDBUpdateParamsNotPtr))
+		//variable.ZapLog.Warn(my_errors.ErrorsGormDBUpdateParamsNotPtr)
+	} else if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Map {
+		// 如果是调用了 gorm.Update 、updates 函数 , 在参数没有传递指针的情况下，无法触发回调函数
+
+	} else if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Ptr && reflect.ValueOf(db.Statement.Dest).Elem().Kind() == reflect.Struct {
+		// 参数校验无错误自动设置 UpdatedAt
+		if b, column := structHasSpecialField("UpdatedAt", db.Statement.Dest); b {
+			db.Statement.SetColumn(column, time.Now().Format(timeutil.CSTLayout))
+		}
+	} else if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Ptr && reflect.ValueOf(db.Statement.Dest).Elem().Kind() == reflect.Map {
+		if b, column := structHasSpecialField("updated_at", db.Statement.Dest); b {
+			destValueOf := reflect.ValueOf(db.Statement.Dest).Elem()
+			destValueOf.SetMapIndex(reflect.ValueOf(column), reflect.ValueOf(time.Now().Format(timeutil.CSTLayout)))
+		}
+	}
+	before(db)
+}
 
 // structHasSpecialField  检查结构体是否有特定字段
 func structHasSpecialField(fieldName string, anyStructPtr interface{}) (bool, string) {

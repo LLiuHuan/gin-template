@@ -1,33 +1,28 @@
 // Package hash
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
-// @create: 2024-07-02 22:00
+// @create: 2024-07-12 11:02
 package hash
 
-var _ Hash = (*hash)(nil)
+import (
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"hash"
+)
 
-type Hash interface {
-	i()
-
-	// HashidsEncode 加密
-	HashidsEncode(params []uint64) (string, error)
-
-	// HashidsDecode 解密
-	HashidsDecode(hash string) ([]uint64, error)
-}
-
-type hash struct {
-	alphabet  string
-	minLength uint8
-	blockList []string
-}
-
-func New(alphabet string, minLength uint8, blockList []string) Hash {
-	return &hash{
-		alphabet:  alphabet,
-		minLength: minLength,
-		blockList: blockList,
+func New(algo string) hash.Hash {
+	switch algo {
+	case "md5":
+		return md5.New()
+	case "sha256":
+		return sha256.New()
+	case "sha512":
+		return sha512.New()
+	case "sha1":
+		return sha1.New()
+	default:
+		return sha256.New()
 	}
 }
-
-func (h *hash) i() {}

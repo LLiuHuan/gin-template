@@ -11,7 +11,7 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/internal/services/cron"
-	"github.com/LLiuHuan/gin-template/pkg/hash"
+	"github.com/LLiuHuan/gin-template/pkg/hashids"
 
 	"go.uber.org/zap"
 )
@@ -55,15 +55,19 @@ type Handler interface {
 type handler struct {
 	logger      *zap.Logger
 	cache       redis.Repo
-	hashids     hash.Hash
+	hashids     hashids.Hash
 	cronService cron.Service
 }
 
 func New(logger *zap.Logger, db database.Repo, cache redis.Repo, cronServer cronRepo.Server) Handler {
 	return &handler{
-		logger:      logger,
-		cache:       cache,
-		hashids:     hash.New(configs.Get().HashIds.Alphabet, configs.Get().HashIds.MinLength, configs.Get().HashIds.BlockList),
+		logger: logger,
+		cache:  cache,
+		hashids: hashids.New(
+			hashids.WithAlphabet(configs.Get().HashIds.Alphabet),
+			hashids.WithMinLength(configs.Get().HashIds.MinLength),
+			hashids.WithBlockList(configs.Get().HashIds.BlockList),
+		),
 		cronService: cron.New(db, cache, cronServer),
 	}
 }

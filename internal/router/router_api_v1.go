@@ -15,7 +15,7 @@ func setApiV1Router(r *resource) {
 	// helper
 	helperHandler := helper.New(r.logger, r.db, r.cache)
 	toolHandler := tool.New(r.logger, r.db, r.cache)
-	adminHandler := admin.New(r.logger, r.db, r.cache)
+	adminHandler := admin.New(r.logger, r.db, r.cache, r.dlp)
 
 	apiRouter := r.mux.Group("/api/v1")
 	{
@@ -23,6 +23,9 @@ func setApiV1Router(r *resource) {
 		{
 			helpers.GET("/md5/:str", helperHandler.Md5())
 			helpers.POST("/sign", helperHandler.Sign())
+			helpers.POST("/upload", helperHandler.UploadFile())
+			helpers.POST("/merge", helperHandler.UploadMerge())
+			helpers.POST("/verify", helperHandler.UploadVerify())
 		}
 
 		notRBAC := apiRouter.Group("", core.DisableTraceLog, core.DisableRecordMetrics)
@@ -49,15 +52,15 @@ func setApiV1Router(r *resource) {
 		login.POST("/login", adminHandler.Login())
 	}
 
-	//// 需要签名验证、登录验证，无需 RBAC 权限验证
-	//notRBAC := r.mux.Group("/api", core.WrapAuthHandler(r.interceptors.CheckLogin), r.interceptors.CheckSignature())
-	//{
-	//	notRBAC.POST("/admin/logout", adminHandler.Logout())
-	//	notRBAC.PATCH("/admin/modify_password", adminHandler.ModifyPassword())
-	//	notRBAC.GET("/admin/info", adminHandler.Detail())
-	//	notRBAC.PATCH("/admin/modify_personal_info", adminHandler.ModifyPersonalInfo())
-	//}
-	//
+	// 需要签名验证、登录验证，无需 RBAC 权限验证
+	notRBAC := r.mux.Group("/api/v1", core.WrapAuthHandler(r.interceptors.CheckLogin), r.interceptors.CheckSignature())
+	{
+		//notRBAC.POST("/admin/logout", adminHandler.Logout())
+		//notRBAC.PATCH("/admin/modify_password", adminHandler.ModifyPassword())
+		notRBAC.GET("/admin/info", adminHandler.Detail())
+		//notRBAC.PATCH("/admin/modify_personal_info", adminHandler.ModifyPersonalInfo())
+	}
+
 	//// 需要签名验证、登录验证、RBAC 权限验证
 	//api := r.mux.Group("/api", core.WrapAuthHandler(r.interceptors.CheckLogin), r.interceptors.CheckSignature(), r.interceptors.CheckRBAC())
 	//{

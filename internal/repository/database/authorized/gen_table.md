@@ -1,4 +1,4 @@
-#### gin-template.authorized 
+#### gin_template.authorized 
 已授权的调用方表
 
 | 序号 | 名称 | 描述 | 类型 | 键 | 为空 | 额外 | 默认值 |

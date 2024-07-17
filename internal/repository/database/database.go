@@ -6,7 +6,6 @@ package database
 
 import (
 	"fmt"
-	"gorm.io/gorm/schema"
 	"strings"
 	"time"
 
@@ -18,6 +17,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
 )
 
@@ -114,6 +114,7 @@ func getDBDriver(mode string, isOpenReadDB int) (*gorm.DB, error) {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
+		// https://github.com/go-gorm/gorm/issues/3789 可通过自定义Logger解决
 	})
 	if err != nil {
 		return nil, err

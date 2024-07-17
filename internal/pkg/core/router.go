@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/LLiuHuan/gin-template/configs"
+	_ "github.com/LLiuHuan/gin-template/docs"
 	"github.com/LLiuHuan/gin-template/pkg/browser"
 	"github.com/LLiuHuan/gin-template/pkg/color"
 	"github.com/LLiuHuan/gin-template/pkg/env"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
 
-	_ "github.com/LLiuHuan/gin-template/docs"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

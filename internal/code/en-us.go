@@ -32,6 +32,10 @@ var enUSText = map[int]string{
 	DBDriverNotExists: "Database driver does not exist",
 	InitializedError:  "Already initialized",
 
+	ReadFileError:       "Failed to read file",
+	FileIncompleteError: "File is incomplete",
+	MkdirError:          "Failed to create directory",
+
 	AuthorizedCreateError:    "Failed to create caller",
 	AuthorizedListError:      "Failed to get caller list",
 	AuthorizedDeleteError:    "Failed to delete caller",

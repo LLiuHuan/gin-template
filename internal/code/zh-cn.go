@@ -32,6 +32,10 @@ var zhCNText = map[int]string{
 	DBDriverNotExists: "数据库驱动不存在",
 	InitializedError:  "已经初始化",
 
+	ReadFileError:       "读取文件失败",
+	FileIncompleteError: "文件不完整",
+	MkdirError:          "创建目录失败",
+
 	AuthorizedCreateError:    "创建调用方失败",
 	AuthorizedListError:      "获取调用方列表失败",
 	AuthorizedDeleteError:    "删除调用方失败",

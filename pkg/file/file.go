@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"os"
 )
 
@@ -29,10 +30,68 @@ type ReadLineFromEnd struct {
 	isFirst bool
 }
 
+// SaveFile 保存文件
+func SaveFile(path string, file *multipart.FileHeader) (int64, error) {
+	f, err := file.Open()
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+
+	dst, err := os.Create(path)
+	if err != nil {
+		return 0, err
+	}
+	defer dst.Close()
+
+	return io.Copy(dst, f)
+}
+
 // IsExists 文件是否存在
 func IsExists(path string) (os.FileInfo, bool) {
 	f, err := os.Stat(path)
 	return f, err == nil || os.IsExist(err)
+}
+
+// MkdirAll 创建文件夹
+func MkdirAll(path string) error {
+	if _, b := IsExists(path); !b {
+		err := os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
+// FileSize 文件大小
+func FileSize(path string) (int64, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	stat, err := f.Stat() //获取文件状态
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+	return stat.Size(), nil
+}
+
+// FindAllFile 查找所有文件
+func FindAllFile(path string) (s []string, err error) {
+	s = make([]string, 0)
+	rd, err := os.ReadDir(path)
+	if err != nil {
+		return s, err
+	}
+	for _, file := range rd {
+		if !file.IsDir() {
+			s = append(s, file.Name())
+		}
+	}
+	return s, nil
 }
 
 // NewReadLineFromEnd 从末尾读取文件内容

@@ -3,7 +3,6 @@ package helper
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -44,7 +43,6 @@ func (h *handler) Md5() core.HandlerFunc {
 			return
 		}
 
-		fmt.Println("md5Request:", req)
 		time.Sleep(time.Second * 30)
 
 		m := md5.New()

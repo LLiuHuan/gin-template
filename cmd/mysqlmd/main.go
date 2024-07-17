@@ -143,6 +143,7 @@ func main() {
 		mdFile.Close()
 
 		modelContent += "}\n"
+		modelContent += fmt.Sprintf("\nfunc (*%s) TableName() string {\n\treturn \"%s\"\n}\n", capitalize(table.Name), table.Name)
 		modelFile.WriteString(modelContent)
 		modelFile.Close()
 

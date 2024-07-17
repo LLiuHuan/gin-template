@@ -1,8 +1,8 @@
-// Package hash
+// Package hashids
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2024-07-02 22:00
-package hash
+package hashids
 
 import "github.com/sqids/sqids-go"
 

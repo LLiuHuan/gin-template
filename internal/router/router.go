@@ -6,6 +6,8 @@ package router
 
 import (
 	"fmt"
+	dlp "github.com/bytedance/godlp"
+	"github.com/bytedance/godlp/dlpheader"
 
 	"github.com/LLiuHuan/gin-template/internal/alert"
 	"github.com/LLiuHuan/gin-template/internal/metrics"
@@ -26,6 +28,7 @@ type resource struct {
 	cache        redis.Repo
 	interceptors interceptor.Interceptor
 	cronServer   cron.Server
+	dlp          dlpheader.EngineAPI
 	//ctx          context.Context
 }
 
@@ -34,6 +37,7 @@ type Server struct {
 	Db         database.Repo
 	Cache      redis.Repo
 	CronServer cron.Server
+	Dlp        dlpheader.EngineAPI
 }
 
 func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) {
@@ -74,6 +78,19 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	}
 	cronServer.Start()
 	r.cronServer = cronServer
+
+	// 初始化DLP
+	callerID := "gin-template"
+	dlpEngine, err := dlp.NewEngine(callerID)
+	if err != nil {
+		logger.Fatal("new dlp err", zap.Error(err))
+		panic(err)
+	}
+	if err = dlpEngine.ApplyConfigDefault(); err != nil {
+		logger.Fatal("apply dlp config err", zap.Error(err))
+		panic(err)
+	}
+	r.dlp = dlpEngine
 	//}
 
 	mux, err := core.NewRouter(logger,
@@ -108,6 +125,7 @@ func NewHTTPServer(logger *zap.Logger, cronLogger *zap.Logger) (*Server, error) 
 	s.Db = r.db
 	s.Cache = r.cache
 	s.CronServer = r.cronServer
+	s.Dlp = r.dlp
 
 	return s, nil
 }
@@ -130,5 +148,9 @@ func ShutdownServer(logger *zap.Logger, s *Server) {
 	if s.CronServer != nil {
 		fmt.Println("cron close")
 		s.CronServer.Stop()
+	}
+
+	if s.Dlp != nil {
+		s.Dlp.Close()
 	}
 }

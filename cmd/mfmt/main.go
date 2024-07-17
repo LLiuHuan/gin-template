@@ -13,7 +13,6 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -73,7 +72,7 @@ func main() {
 			return nil
 		}
 
-		raw, err := ioutil.ReadFile(path)
+		raw, err := os.ReadFile(path)
 		if err != nil {
 			return errors.Wrapf(err, "read file %s err", path)
 		}
@@ -133,7 +132,7 @@ func main() {
 			fmt.Println(path)
 		}
 
-		if err = ioutil.WriteFile(path, raw, info.Mode()); err != nil {
+		if err = os.WriteFile(path, raw, info.Mode()); err != nil {
 			return errors.Wrapf(err, "write file %s err", path)
 		}
 

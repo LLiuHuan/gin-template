@@ -1,4 +1,4 @@
-#### gin-template.admin 
+#### gin_template.admin 
 管理员表
 
 | 序号 | 名称 | 描述 | 类型 | 键 | 为空 | 额外 | 默认值 |

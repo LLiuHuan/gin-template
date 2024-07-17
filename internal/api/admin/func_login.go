@@ -3,6 +3,8 @@ package admin
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
@@ -12,7 +14,6 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/internal/services/admin"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
-	"net/http"
 )
 
 type loginRequest struct {
