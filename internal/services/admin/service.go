@@ -9,6 +9,8 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/database/admin"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
+	"github.com/mojocn/base64Captcha"
+	"go.uber.org/zap"
 )
 
 var _ Service = (*service)(nil)
@@ -30,17 +32,27 @@ type Service interface {
 	//ListMenu(ctx core.Context, searchData *SearchListMenuData) (menuData []ListMenuData, err error)
 	MyMenu(ctx core.Context, searchData *SearchMyMenuData) (menuData []ListMyMenuData, err error)
 	MyAction(ctx core.Context, searchData *SearchMyActionData) (actionData []MyActionData, err error)
+	Captcha(ctx core.Context) (captchaData CaptchaData, err error)
+	CaptchaVerify(ctx core.Context, captcha string, captchaId string) bool
 }
 
 type service struct {
-	db    database.Repo
-	cache redis.Repo
+	db     database.Repo
+	cache  redis.Repo
+	logger *zap.Logger
 }
 
-func New(db database.Repo, cache redis.Repo) Service {
+// 当开启多服务器部署时，替换下面的配置，使用redis共享存储验证码
+// var store *captcha.RedisStore
+var store base64Captcha.Store
+
+func New(db database.Repo, cache redis.Repo, logger *zap.Logger) Service {
+	//store = captcha.NewDefaultRedisStore(cache, logger)
+	store = base64Captcha.DefaultMemStore
 	return &service{
-		db:    db,
-		cache: cache,
+		db:     db,
+		cache:  cache,
+		logger: logger,
 	}
 }
 

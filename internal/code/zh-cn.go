@@ -58,6 +58,8 @@ var zhCNText = map[int]string{
 	AdminMenuCreateError:         "管理员菜单授权失败",
 	AdminOfflineError:            "下线管理员失败",
 	AdminDetailError:             "获取个人信息失败",
+	AdminCaptchaError:            "获取验证码失败",
+	AdminCaptchaVerifyError:      "验证码校验失败",
 
 	MenuCreateError:       "创建菜单失败",
 	MenuUpdateError:       "更新菜单失败",

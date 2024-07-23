@@ -16,8 +16,10 @@ import (
 )
 
 type loginRequest struct {
-	Username string `form:"username" json:"username" binding:"required"`              // 用户名
-	Password string `form:"password" json:"password" binding:"min=4,max=16,required"` // 密码
+	Username  string `form:"username" json:"username" binding:"required"`              // 用户名
+	Password  string `form:"password" json:"password" binding:"min=4,max=16,required"` // 密码
+	Captcha   string `form:"captcha" json:"captcha" binding:"required"`                // 验证码
+	CaptchaId string `form:"captchaId" json:"captchaId" binding:"required"`            // 验证码ID
 }
 
 type loginResponse struct {
@@ -42,12 +44,26 @@ func (h *handler) Login() core.HandlerFunc {
 	return func(ctx core.Context) {
 		req := new(loginRequest)
 		res := new(loginResponse)
+		key := ctx.GetCtx().ClientIP()
+
 		if err := ctx.ShouldBindJSON(req); err != nil {
 			ctx.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).
 				WithError(validation.ErrorE(err)),
+			)
+			return
+		}
+
+		println(req)
+
+		// 验证码校验
+		if b := h.adminService.CaptchaVerify(ctx, req.Captcha, req.CaptchaId); !b {
+			ctx.AbortWithError(core.Error(
+				http.StatusBadRequest,
+				code.AdminCaptchaVerifyError,
+				code.Text(code.AdminCaptchaVerifyError)),
 			)
 			return
 		}
@@ -64,6 +80,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
 			)
+			h.cache.Incr(key)
 			return
 		}
 
@@ -73,6 +90,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(errors.New("未查询出符合条件的用户")),
 			)
+			h.cache.Incr(key)
 			return
 		}
 
@@ -92,6 +110,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
 			)
+			h.cache.Incr(key)
 			return
 		}
 
@@ -104,6 +123,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
 			)
+			h.cache.Incr(key)
 			return
 		}
 
@@ -118,6 +138,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
 			)
+			h.cache.Incr(key)
 			return
 		}
 
@@ -130,6 +151,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
 			)
+			h.cache.Incr(key)
 			return
 		}
 
@@ -144,6 +166,7 @@ func (h *handler) Login() core.HandlerFunc {
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
 			)
+			h.cache.Incr(key)
 			return
 		}
 

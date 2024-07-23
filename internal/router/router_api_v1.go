@@ -60,6 +60,7 @@ func setApiV1Router(r *resource) {
 	login := r.mux.Group("/api/v1", r.interceptors.CheckSignature())
 	{
 		login.POST("/login", adminHandler.Login())
+		login.POST("/captcha", adminHandler.Captcha())
 	}
 
 	// 需要签名验证、登录验证，无需 RBAC 权限验证

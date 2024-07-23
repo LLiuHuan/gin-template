@@ -77,6 +77,8 @@ const (
 	AdminMenuCreateError         = 20211
 	AdminOfflineError            = 20212
 	AdminDetailError             = 20213
+	AdminCaptchaError            = 20214
+	AdminCaptchaVerifyError      = 20215
 
 	MenuCreateError       = 20301
 	MenuUpdateError       = 20302

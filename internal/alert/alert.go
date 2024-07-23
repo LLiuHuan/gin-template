@@ -7,9 +7,12 @@
 package alert
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/proposal"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
+	"github.com/LLiuHuan/gin-template/pkg/httpclient"
 	"github.com/LLiuHuan/gin-template/pkg/mail"
 
 	"go.uber.org/zap"
@@ -81,7 +84,10 @@ func sendWeChat(logger *zap.Logger, msg *proposal.AlertMessage) {
 		return
 	}
 
-	//url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=%s", cfg.Key)
+	url := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=%s", cfg.Key)
+	data := json.RawMessage(`{"msgtype": "markdown", "markdown": {"content": "测试消息哦"}}`)
+	body, err := httpclient.PostJSON(url, data)
+	fmt.Println(body, err)
 
 	return
 }

@@ -12,7 +12,6 @@ import (
 	"github.com/LLiuHuan/gin-template/internal/services/admin"
 	"github.com/LLiuHuan/gin-template/pkg/hashids"
 	"github.com/bytedance/godlp/dlpheader"
-
 	"go.uber.org/zap"
 )
 
@@ -85,6 +84,11 @@ type Handler interface {
 	// @Tags API.admin
 	// @Router /api/v1/admin/menu/{id} [get]
 	ListAdminMenu() core.HandlerFunc
+
+	// Captcha 获取验证码
+	// @Tags API.admin
+	// @Router /api/v1/captcha [get]
+	Captcha() core.HandlerFunc
 }
 
 type handler struct {
@@ -104,7 +108,7 @@ func New(logger *zap.Logger, db database.Repo, cache redis.Repo, dlp dlpheader.E
 			hashids.WithMinLength(configs.Get().HashIds.MinLength),
 			hashids.WithBlockList(configs.Get().HashIds.BlockList),
 		),
-		adminService: admin.New(db, cache),
+		adminService: admin.New(db, cache, logger),
 		dlp:          dlp,
 	}
 }

@@ -49,6 +49,8 @@ func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (info *
 
 	info, err = qb.QueryOne(s.db.GetDB().WithContext(ctx.RequestContext()))
 	if err != nil {
+		key := ctx.GetCtx().ClientIP()
+		s.cache.Incr(key)
 		return nil, err
 	}
 

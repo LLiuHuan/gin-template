@@ -47,6 +47,7 @@ type Config struct {
 	Redis    Redis    `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`             // redis配置
 	DataBase DataBase `mapstructure:"database" json:"database" yaml:"database" toml:"database"` // 数据库配置
 	HashIds  HashIds  `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"`  // hashIds配置
+	Captcha  Captcha  `mapstructure:"captcha" json:"captcha" yaml:"captcha" toml:"captcha"`     // 验证码配置
 }
 
 var (

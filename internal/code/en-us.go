@@ -58,6 +58,8 @@ var enUSText = map[int]string{
 	AdminMenuCreateError:         "Administrator menu authorization failed",
 	AdminOfflineError:            "Offline administrator failed",
 	AdminDetailError:             "Failed to get personal information",
+	AdminCaptchaError:            "Failed to get captcha",
+	AdminCaptchaVerifyError:      "Captcha verification failed",
 
 	MenuCreateError:       "Failed to create menu",
 	MenuUpdateError:       "Failed to update menu",
