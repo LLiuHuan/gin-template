@@ -89,7 +89,6 @@ func New() (Repo, error) {
 
 		return nil, errors.Wrap(err, "ping redis err")
 	}
-
 	return repo, nil
 }
 
@@ -236,6 +235,7 @@ func (c *cacheRepo) Exists(keys ...string) bool {
 	if len(keys) == 0 {
 		return true
 	}
+	println(c.client.Exists(c.ctx, keys...).Result())
 	value, _ := c.client.Exists(c.ctx, keys...).Result()
 	return value > 0
 }

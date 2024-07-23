@@ -95,6 +95,7 @@ func (h *handler) Install() core.HandlerFunc {
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
 			)
+			server.OnClose()
 			return
 		}
 
@@ -104,6 +105,7 @@ func (h *handler) Install() core.HandlerFunc {
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
 			)
+			server.OnClose()
 			return
 		}
 
@@ -193,7 +195,6 @@ func (h *handler) Install() core.HandlerFunc {
 
 		err = server.OnSend([]byte("已检测 MySQL 配置可用。"))
 		if err != nil {
-			fmt.Println(err)
 			ctx.AbortWithError(core.Error(
 				http.StatusInternalServerError,
 				code.SocketSendError,
@@ -238,7 +239,6 @@ func (h *handler) Install() core.HandlerFunc {
 		config.Set(dbBase+".name", req.DatabaseName)
 		err = config.WriteConfig()
 		if err != nil {
-			fmt.Println(err)
 			ctx.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.WriteConfigError,

@@ -76,6 +76,9 @@ func (e *businessError) BusinessCode() int {
 
 func (e *businessError) Message() string {
 	if env.Active().IsDev() {
+		if e.stackError == nil {
+			return e.message
+		}
 		return e.message + ":" + e.stackError.Error()
 	}
 	return e.message

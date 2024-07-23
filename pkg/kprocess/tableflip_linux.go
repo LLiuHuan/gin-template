@@ -52,7 +52,6 @@ func (k *kProcess) Listen(network, addr string) (ln net.Listener, err error) {
 	}
 
 	k.pid = os.Getpid()
-	k.logger.Info(fmt.Sprintf("exec process pid %d \n", k.pid))
 
 	k.processUp, err = tableflip.New(tableflip.Options{
 		UpgradeTimeout: 5 * time.Second,

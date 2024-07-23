@@ -12,8 +12,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LLiuHuan/gin-template/cmd/mysqlmd/mysql"
-
 	"gorm.io/gorm"
 )
 
@@ -37,7 +35,9 @@ type tableColumn struct {
 }
 
 var (
-	dbAddr    string
+	dbMode    string
+	dbHost    string
+	dbPort    string
 	dbUser    string
 	dbPass    string
 	dbName    string
@@ -45,7 +45,9 @@ var (
 )
 
 func init() {
-	addr := flag.String("addr", "", "请输入 db 地址，例如：127.0.0.1:3306\n")
+	mode := flag.String("mode", "mysql", "请输入数据库类型，例如：mysql\n")
+	host := flag.String("addr", "", "请输入 db IP，例如：127.0.0.1\n")
+	port := flag.String("addr", "", "请输入 db 端口，例如：3306\n")
 	user := flag.String("user", "", "请输入 db 用户名\n")
 	pass := flag.String("pass", "", "请输入 db 密码\n")
 	name := flag.String("name", "", "请输入 db 名称\n")
@@ -53,7 +55,9 @@ func init() {
 
 	flag.Parse()
 
-	dbAddr = *addr
+	dbMode = *mode
+	dbHost = *host
+	dbPort = *port
 	dbUser = *user
 	dbPass = *pass
 	dbName = strings.ToLower(*name)
@@ -62,18 +66,18 @@ func init() {
 
 func main() {
 	// 初始化 DB
-	db, err := mysql.New(dbAddr, dbUser, dbPass, dbName)
+	db, err := New(dbMode, dbUser, dbPass, dbHost, dbPort, dbName)
 	if err != nil {
 		log.Fatal("new db err", err)
 	}
 
 	defer func() {
-		if err := db.DbClose(); err != nil {
+		if err := db.DBClose(); err != nil {
 			log.Println("db close err", err)
 		}
 	}()
 
-	tables, err := queryTables(db.GetDb(), dbName, genTables)
+	tables, err := queryTables(db.GetDB(), dbName, genTables)
 	if err != nil {
 		log.Println("query tables of database err", err)
 		return
@@ -115,7 +119,7 @@ func main() {
 			"| 序号 | 名称 | 描述 | 类型 | 键 | 为空 | 额外 | 默认值 |\n" +
 			"| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :--: |\n"
 
-		columnInfo, columnInfoErr := queryTableColumn(db.GetDb(), dbName, table.Name)
+		columnInfo, columnInfoErr := queryTableColumn(db.GetDB(), dbName, table.Name)
 		if columnInfoErr != nil {
 			continue
 		}

@@ -2,7 +2,6 @@ package admin
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/LLiuHuan/gin-template/configs"
@@ -44,7 +43,6 @@ func (h *handler) Login() core.HandlerFunc {
 		req := new(loginRequest)
 		res := new(loginResponse)
 		if err := ctx.ShouldBindJSON(req); err != nil {
-			fmt.Println(err)
 			ctx.AbortWithError(core.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,

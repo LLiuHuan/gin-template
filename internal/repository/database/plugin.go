@@ -39,7 +39,6 @@ func (op *TracePlugin) Initialize(db *gorm.DB) (err error) {
 	// 开始前 - 并不是都用相同的方法，可以自己自定义
 	_ = db.Callback().Query().Before("gorm:query").Register(callBackBeforeName, before)
 	_ = db.Callback().Delete().Before("gorm:before_delete").Register(callBackBeforeName, before)
-	_ = db.Callback().Update().Before("gorm:setup_reflect_value").Register(callBackBeforeName, before)
 	_ = db.Callback().Row().Before("gorm:row").Register(callBackBeforeName, before)
 	_ = db.Callback().Raw().Before("gorm:raw").Register(callBackBeforeName, before)
 	// https://github.com/go-gorm/gorm/issues/4838
@@ -51,7 +50,7 @@ func (op *TracePlugin) Initialize(db *gorm.DB) (err error) {
 	_ = db.Callback().Create().After("gorm:after_create").Register(callBackAfterName, after)
 	_ = db.Callback().Query().After("gorm:after_query").Register(callBackAfterName, after)
 	_ = db.Callback().Delete().After("gorm:after_delete").Register(callBackAfterName, after)
-	//_ = db.Callback().Update().After("gorm:after_update").Register(callBackAfterName, after)
+	_ = db.Callback().Update().After("gorm:after_update").Register(callBackAfterName, after)
 	_ = db.Callback().Row().After("gorm:row").Register(callBackAfterName, after)
 	_ = db.Callback().Raw().After("gorm:raw").Register(callBackAfterName, after)
 	return
@@ -106,7 +105,6 @@ func maskNotDataError(db *gorm.DB) {
 
 // createBeforeHook InterceptCreatePramsNotPtrError 拦截 create 函数参数如果是非指针类型的错误,新用户最容犯此错误
 func createBeforeHook(db *gorm.DB) {
-	before(db)
 	if reflect.TypeOf(db.Statement.Dest).Kind() != reflect.Ptr {
 		//db.Error = errors.New("gorm Create 函数的参数必须是一个指针")
 		fmt.Println("gorm Create 函数的参数必须是一个指针")
@@ -159,6 +157,7 @@ func createBeforeHook(db *gorm.DB) {
 // 最终就可以完美兼支持、兼容 gorm 的所有回调函数
 // 但是如果是指定字段更新，例如： UpdateColumn 函数则只传递值即可，不需要做校验
 func updateBeforeHook(db *gorm.DB) {
+	before(db)
 	if reflect.TypeOf(db.Statement.Dest).Kind() == reflect.Struct {
 		//_ = db.AddError(errors.New(my_errors.ErrorsGormDBUpdateParamsNotPtr))
 		//variable.ZapLog.Warn(my_errors.ErrorsGormDBUpdateParamsNotPtr)
@@ -176,7 +175,6 @@ func updateBeforeHook(db *gorm.DB) {
 			destValueOf.SetMapIndex(reflect.ValueOf(column), reflect.ValueOf(time.Now().Format(timeutil.CSTLayout)))
 		}
 	}
-	before(db)
 }
 
 // structHasSpecialField  检查结构体是否有特定字段

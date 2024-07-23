@@ -9,7 +9,7 @@ fi
 }
 
 printf "\nRegenerating file\n\n"
-time go run -v ./cmd/mysqlmd/main.go  -addr $1 -user $2 -pass $3 -name $4 -tables $5
+time go run -v ./cmd/database/main.go  -addr $1 -user $2 -pass $3 -name $4 -tables $5
 shellExit $?
 
 printf "\ncreate curd code : \n"

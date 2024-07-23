@@ -3,11 +3,9 @@ package helper
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"net/http"
-	"time"
-
 	"github.com/LLiuHuan/gin-template/internal/code"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
+	"net/http"
 )
 
 type md5Request struct {
@@ -42,8 +40,6 @@ func (h *handler) Md5() core.HandlerFunc {
 			)
 			return
 		}
-
-		time.Sleep(time.Second * 30)
 
 		m := md5.New()
 		m.Write([]byte(req.Str))

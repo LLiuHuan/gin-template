@@ -3,6 +3,7 @@ module github.com/LLiuHuan/gin-template
 go 1.22.0
 
 require (
+	github.com/bytedance/godlp v1.2.15
 	github.com/cloudflare/tableflip v1.2.3
 	github.com/dave/dst v0.27.3
 	github.com/fsnotify/fsnotify v1.7.0
@@ -24,6 +25,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
+	github.com/unrolled/secure v1.15.0
 	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.16.0
@@ -41,7 +43,6 @@ require (
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/godlp v1.2.15 // indirect
 	github.com/bytedance/sonic v1.11.9 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect

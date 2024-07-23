@@ -5,6 +5,7 @@
 package tool
 
 import (
+	"github.com/LLiuHuan/gin-template/configs"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
 	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
@@ -58,6 +59,11 @@ type Handler interface {
 	// @Router /api/v1/tool/project/info [get]
 	ProjectInfo() core.HandlerFunc
 
+	// Logs 查询日志
+	// @Tags API.tool
+	// @Router /api/v1/tool/logs [get]
+	Logs() core.HandlerFunc
+
 	//// SendMessage 发送消息
 	//// @Tags API.tool
 	//// @Router /api/v1/tool/send_message [post]
@@ -76,6 +82,11 @@ func New(logger *zap.Logger, db database.Repo, cache redis.Repo) Handler {
 		logger: logger,
 		db:     db,
 		cache:  cache,
+		hashids: hashids.New(
+			hashids.WithMinLength(configs.Get().HashIds.MinLength),
+			hashids.WithAlphabet(configs.Get().HashIds.Alphabet),
+			hashids.WithBlockList(configs.Get().HashIds.BlockList),
+		),
 	}
 }
 

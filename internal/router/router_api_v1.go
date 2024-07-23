@@ -35,6 +35,16 @@ func setApiV1Router(r *resource) {
 			toolRouter := notRBAC.Group("/tool")
 			{
 				toolRouter.GET("/project/info", toolHandler.ProjectInfo())
+				//	toolHandler := tool.New(r.logger, r.db, r.cache)
+				toolRouter.GET("/hashids/encode/:id", core.AliasForRecordMetrics("/api/tool/hashids/encode"), toolHandler.HashIdsEncode())
+				toolRouter.GET("/hashids/decode/:id", core.AliasForRecordMetrics("/api/tool/hashids/decode"), toolHandler.HashIdsDecode())
+				toolRouter.POST("/cache/search", toolHandler.SearchCache())
+				toolRouter.PATCH("/cache/clear", toolHandler.ClearCache())
+				toolRouter.GET("/project/logs", toolHandler.Logs())
+				//	api.GET("/tool/data/dbs", toolHandler.Dbs())
+				//	api.POST("/tool/data/tables", toolHandler.Tables())
+				//	api.POST("/tool/data/mysql", toolHandler.SearchMySQL())
+				//	api.POST("/tool/send_message", toolHandler.SendMessage())
 			}
 		}
 

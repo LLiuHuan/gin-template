@@ -5,8 +5,8 @@
 package sys_message
 
 import (
-	"github.com/LLiuHuan/gin-template/cmd/mysqlmd/mysql"
 	"github.com/LLiuHuan/gin-template/internal/pkg/core"
+	"github.com/LLiuHuan/gin-template/internal/repository/database"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/internal/repository/socket"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
@@ -22,10 +22,10 @@ var (
 type handler struct {
 	logger *zap.Logger
 	cache  redis.Repo
-	db     mysql.Repo
+	db     database.Repo
 }
 
-func New(logger *zap.Logger, db mysql.Repo, cache redis.Repo) *handler {
+func New(logger *zap.Logger, db database.Repo, cache redis.Repo) *handler {
 	return &handler{
 		logger: logger,
 		cache:  cache,

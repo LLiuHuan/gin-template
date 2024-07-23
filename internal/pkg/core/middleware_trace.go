@@ -47,7 +47,6 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 	}
 
 	return func(ctx *gin.Context) {
-
 		if ctx.Writer.Status() == http.StatusNotFound {
 			return
 		}
@@ -109,13 +108,11 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 				}
 			}
 			// endregion
-
 			// region 发生错误，进行返回
 			if ctx.IsAborted() {
 				for i := range ctx.Errors {
 					multierr.AppendInto(&abortErr, ctx.Errors[i])
 				}
-
 				if err := c.abortError(); err != nil { // customer err
 					// 判断是否需要发送告警通知
 					if err.IsAlert() {
@@ -157,7 +154,6 @@ func MiddlewareTrace(logger *zap.Logger, opt *option) gin.HandlerFunc {
 				})
 			}
 			// endregion
-
 			// region 记录指标
 			if opt.recordHandler != nil && c.isRecordMetrics() {
 				path := c.Path()

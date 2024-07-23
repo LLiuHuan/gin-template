@@ -42,7 +42,7 @@ func init() {
 // @name						token
 func main() {
 	accessLogger, err := logger.NewJSONLogger(
-		logger.WithDisableConsole(),
+		//logger.WithDisableConsole(),
 		logger.WithField("domain", fmt.Sprintf("%s[%s]", configs.ProjectName, env.Active().Value())),
 		logger.WithTimeLayout(timeutil.CSTLayout),
 		logger.WithFileRotationP(configs.ProjectLogFile))
