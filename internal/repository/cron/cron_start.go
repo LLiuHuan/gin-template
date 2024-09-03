@@ -8,8 +8,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/LLiuHuan/gin-template/internal/repository/database"
-	"github.com/LLiuHuan/gin-template/internal/repository/database/cron_task"
+	"github.com/LLiuHuan/gin-template/internal/repository/gorm/cron_task"
 
 	"go.uber.org/zap"
 )
@@ -19,7 +18,7 @@ func (s *server) Start() {
 	go s.taskCount.Wait()
 
 	qb := cron_task.NewQueryBuilder()
-	qb.WhereIsUsed(database.EqualPredicate, cron_task.IsUsedYES)
+	//qb.WhereIsUsed(gorm.EqualPredicate, cron_task.IsUsedYES)
 	totalNum, err := qb.Count(s.db.GetDB())
 	if err != nil {
 		s.logger.Fatal("cron initialize tasks count err", zap.Error(err))
@@ -33,7 +32,7 @@ func (s *server) Start() {
 
 	for page := 1; page <= maxPage; page++ {
 		qb = cron_task.NewQueryBuilder()
-		qb.WhereIsUsed(database.EqualPredicate, cron_task.IsUsedYES)
+		//qb.WhereIsUsed(gorm.EqualPredicate, cron_task.IsUsedYES)
 		listData, err := qb.
 			Limit(pageSize).
 			Offset((page - 1) * pageSize).

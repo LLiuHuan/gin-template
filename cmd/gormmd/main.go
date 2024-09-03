@@ -1,4 +1,4 @@
-// Package mysqlmd
+// Package main
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2024-07-02 21:51
@@ -11,6 +11,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/LLiuHuan/gin-template/cmd/gormmd/pkg"
 
 	"gorm.io/gorm"
 )
@@ -46,8 +48,8 @@ var (
 
 func init() {
 	mode := flag.String("mode", "mysql", "请输入数据库类型，例如：mysql\n")
-	host := flag.String("addr", "", "请输入 db IP，例如：127.0.0.1\n")
-	port := flag.String("addr", "", "请输入 db 端口，例如：3306\n")
+	host := flag.String("host", "", "请输入 db IP，例如：127.0.0.1\n")
+	port := flag.String("port", "", "请输入 db 端口，例如：3306\n")
 	user := flag.String("user", "", "请输入 db 用户名\n")
 	pass := flag.String("pass", "", "请输入 db 密码\n")
 	name := flag.String("name", "", "请输入 db 名称\n")
@@ -65,8 +67,9 @@ func init() {
 }
 
 func main() {
+	fmt.Println(dbMode, dbHost, dbPort, dbUser, dbPass, dbName)
 	// 初始化 DB
-	db, err := New(dbMode, dbUser, dbPass, dbHost, dbPort, dbName)
+	db, err := pkg.NewDB(dbMode, dbUser, dbPass, dbHost, dbPort, dbName)
 	if err != nil {
 		log.Fatal("new db err", err)
 	}
@@ -79,13 +82,13 @@ func main() {
 
 	tables, err := queryTables(db.GetDB(), dbName, genTables)
 	if err != nil {
-		log.Println("query tables of database err", err)
+		log.Println("query tables of gorm err", err)
 		return
 	}
 
 	for _, table := range tables {
 
-		filepath := "./internal/repository/database/" + table.Name
+		filepath := "./internal/repository/gorm/" + table.Name
 		_ = os.Mkdir(filepath, 0766)
 		fmt.Println("create dir : ", filepath)
 

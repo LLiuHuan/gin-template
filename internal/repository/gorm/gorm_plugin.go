@@ -1,9 +1,9 @@
-// Package database
+// Package gorm
 //
 //	@program:	gin-template
 //	@author:	[lliuhuan](https://github.com/lliuhuan)
 //	@create:	2024-07-03 10:19
-package database
+package gorm
 
 import (
 	"fmt"

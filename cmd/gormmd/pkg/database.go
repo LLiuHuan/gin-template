@@ -1,18 +1,20 @@
-// Package main
+// Package pkg
 // @program: gin-template
 // @author: [lliuhuan](https://github.com/lliuhuan)
 // @create: 2024-07-23 17:55
-package main
+package pkg
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/LLiuHuan/gin-template/pkg/errors"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	"strings"
 )
 
 var _ Repo = (*dbRepo)(nil)
@@ -27,8 +29,9 @@ type dbRepo struct {
 	DB *gorm.DB
 }
 
-// New 创建一个DB对象
-func New(mode, dbUser, dbPass, dbHose, dbPort, dbName string) (Repo, error) {
+// NewDB 创建一个DB对象
+func NewDB(mode, dbUser, dbPass, dbHose, dbPort, dbName string) (Repo, error) {
+	fmt.Println(mode, dbUser, dbPass, dbHose, dbPort, dbName)
 	db, err := getDBDriver(mode, dbUser, dbPass, dbHose, dbPort, dbName)
 	if err != nil {
 		return nil, err
@@ -99,7 +102,7 @@ func getDsn(mode, dbUser, dbPass, dbHose, dbPort, dbName string) string {
 	case "mysql":
 		return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local", dbUser, dbPass, dbHose, dbPort, dbName, "utf8mb4")
 	case "sqlserver", "mssql":
-		return fmt.Sprintf("server=%s;port=%s;database=%s;user id=%s;password=%s;encrypt=disable", dbHose, dbPort, dbName, dbUser, dbPass)
+		return fmt.Sprintf("server=%s;port=%s;gorm=%s;user id=%s;password=%s;encrypt=disable", dbHose, dbPort, dbName, dbUser, dbPass)
 	case "postgresql", "postgre", "postgres":
 		return fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=Asia/Shanghai", dbHose, dbPort, dbName, dbUser, dbPass)
 	}

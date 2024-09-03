@@ -8,8 +8,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/LLiuHuan/gin-template/internal/repository/database"
-	"github.com/LLiuHuan/gin-template/internal/repository/database/cron_task"
+	"github.com/LLiuHuan/gin-template/internal/repository/gorm"
+	"github.com/LLiuHuan/gin-template/internal/repository/gorm/cron_task"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 
 	"github.com/robfig/cron/v3"
@@ -46,7 +46,7 @@ func (tc *taskCount) Wait() {
 
 type server struct {
 	logger    *zap.Logger
-	db        database.Repo
+	db        gorm.Repo
 	cache     redis.Repo
 	cron      *cron.Cron
 	taskCount *taskCount
@@ -71,7 +71,7 @@ type Server interface {
 	AddJob(task *cron_task.CronTask) cron.FuncJob
 }
 
-func New(logger *zap.Logger, db database.Repo, cache redis.Repo) (Server, error) {
+func New(logger *zap.Logger, db gorm.Repo, cache redis.Repo) (Server, error) {
 	if logger == nil {
 		return nil, errors.New("logger required")
 	}

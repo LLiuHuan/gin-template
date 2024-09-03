@@ -1,4 +1,4 @@
-// Package gin_template
+// Package gin-template
 //
 //	@program:	gin-template
 //	@author:	[lliuhuan](https://github.com/lliuhuan)
@@ -18,12 +18,16 @@ import (
 	"github.com/LLiuHuan/gin-template/pkg/kprocess"
 	"github.com/LLiuHuan/gin-template/pkg/logger"
 	"github.com/LLiuHuan/gin-template/pkg/timeutil"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 初始化执行
 func init() {
+	// 开发模式
+	gin.SetMode(gin.DebugMode)
+	// 生产模式
 	//gin.SetMode(gin.ReleaseMode)
-
 }
 
 //	@title		swagger 接口文档
@@ -42,7 +46,7 @@ func init() {
 // @name						token
 func main() {
 	accessLogger, err := logger.NewJSONLogger(
-		//logger.WithDisableConsole(),
+		logger.WithDisableConsole(),
 		logger.WithField("domain", fmt.Sprintf("%s[%s]", configs.ProjectName, env.Active().Value())),
 		logger.WithTimeLayout(timeutil.CSTLayout),
 		logger.WithFileRotationP(configs.ProjectLogFile))

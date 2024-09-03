@@ -27,7 +27,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LLiuHuan/gin-template/internal/repository/database"
+	"github.com/LLiuHuan/gin-template/internal/repository/gorm"
 
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -139,7 +139,7 @@ func (qb *{{.QueryBuilderName}}) Offset(offset int) *{{.QueryBuilderName}} {
 
 {{$queryBuilderName := .QueryBuilderName}}
 {{range .OptionFields}}
-func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}(p database.Predicate, value {{.FieldType}}) *{{$queryBuilderName}} {
+func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}(p gorm.Predicate, value {{.FieldType}}) *{{$queryBuilderName}} {
 	 qb.where = append(qb.where, struct {
 		prefix string
 		value interface{}

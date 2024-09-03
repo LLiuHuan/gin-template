@@ -12,7 +12,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/LLiuHuan/gin-template/pkg/database"
+	"github.com/LLiuHuan/gin-template/pkg/gorm"
 )
 
 // Parser 解析器用于解析目录并公开有关该目录文件中定义的结构的信息。
@@ -94,7 +94,7 @@ func (p *Parser) parseTypes(file *ast.File) (ret []structConfig) {
 
 				if len(v.Names) > 0 {
 					optionField.FieldName = v.Names[0].String()
-					optionField.ColumnName = database.ToDBName(optionField.FieldName)
+					optionField.ColumnName = gorm.ToDBName(optionField.FieldName)
 					optionField.HumpName = SQLColumnToHumpStyle(optionField.ColumnName)
 				}
 

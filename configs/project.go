@@ -9,6 +9,7 @@ type Project struct {
 	Port    int    `mapstructure:"port" json:"port" toml:"port"`          // 项目端口
 	Local   string `mapstructure:"local" json:"local" toml:"local"`       // 中英文 zh-cn/en-us
 	PidFile string `mapstructure:"pidfile" json:"pidfile" toml:"pidfile"` // pid文件
+	DbType  string `mapstructure:"dbtype" json:"dbType" toml:"dbType"`    // 数据库类型
 	//Name          string `mapstructure:"name" json:"name" yaml:"name"`                              // 项目名称
 	//Version       string `mapstructure:"version" json:"version" yaml:"version"`                     // 项目版本
 	//Port          string `mapstructure:"port" json:"port" yaml:"port"`                              // 端口值

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LLiuHuan/gin-template/internal/repository/database"
+	"github.com/LLiuHuan/gin-template/internal/repository/gorm"
 	"github.com/LLiuHuan/gin-template/internal/repository/redis"
 	"github.com/LLiuHuan/gin-template/pkg/errors"
 
@@ -20,7 +20,7 @@ var _ Server = (*server)(nil)
 
 type server struct {
 	logger *zap.Logger
-	db     database.Repo
+	db     gorm.Repo
 	cache  redis.Repo
 	socket *websocket.Conn
 }
@@ -54,7 +54,7 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
-func New(logger *zap.Logger, db database.Repo, cache redis.Repo, w http.ResponseWriter, r *http.Request, responseHeader http.Header) (Server, error) {
+func New(logger *zap.Logger, db gorm.Repo, cache redis.Repo, w http.ResponseWriter, r *http.Request, responseHeader http.Header) (Server, error) {
 	if logger == nil {
 		return nil, errors.New("logger required")
 	}

@@ -1,10 +1,10 @@
-// Package database
+// Package gorm
 //
 //	@program:		gin-template
 //	@author:		[lliuhuan](https://github.com/lliuhuan)
 //	@create:		2024-07-02 21:56
 //	@description:	数据库
-package database
+package gorm
 
 import (
 	"bytes"

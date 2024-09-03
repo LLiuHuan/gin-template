@@ -42,12 +42,18 @@ type TomlConfigInterf interface {
 }
 
 type Config struct {
-	Project  Project  `mapstructure:"project" json:"project" yaml:"project" toml:"project"`     // 项目信息
-	Notify   Notify   `mapstructure:"notify" json:"notify" yaml:"notify" toml:"notify"`         // 通知配置
-	Redis    Redis    `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`             // redis配置
-	DataBase DataBase `mapstructure:"database" json:"database" yaml:"database" toml:"database"` // 数据库配置
-	HashIds  HashIds  `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"`  // hashIds配置
-	Captcha  Captcha  `mapstructure:"captcha" json:"captcha" yaml:"captcha" toml:"captcha"`     // 验证码配置
+	Project Project `mapstructure:"project" json:"project" yaml:"project" toml:"project"` // 项目信息
+	Notify  Notify  `mapstructure:"notify" json:"notify" yaml:"notify" toml:"notify"`     // 通知配置
+	Redis   Redis   `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`         // redis配置
+	// gorm
+	Mysql   Mysql           `mapstructure:"mysql" json:"mysql" yaml:"mysql" toml:"mysql"`
+	Mssql   Mssql           `mapstructure:"mssql" json:"mssql" yaml:"mssql" toml:"mssql"`
+	Pgsql   Pgsql           `mapstructure:"pgsql" json:"pgsql" yaml:"pgsql" toml:"pgsql"`
+	Oracle  Oracle          `mapstructure:"oracle" json:"oracle" yaml:"oracle" toml:"oracle"`
+	Sqlite  Sqlite          `mapstructure:"sqlite" json:"sqlite" yaml:"sqlite" toml:"sqlite"`
+	DBList  []SpecializedDB `mapstructure:"dbList" json:"dbList" yaml:"dbList" toml:"dbList"`
+	HashIds HashIds         `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"` // hashIds配置
+	Captcha Captcha         `mapstructure:"captcha" json:"captcha" yaml:"captcha" toml:"captcha"`    // 验证码配置
 }
 
 var (
@@ -86,7 +92,7 @@ func GetContainer() TomlConfigInterf {
 	return configContainer
 }
 
-// CreateTomlFactory 创建一个yaml配置文件工厂
+// CreateTomlFactory 创建一个toml配置文件工厂
 // 两种方式存储配置文件，一种是解析到结构体，一种是使用KV
 func CreateTomlFactory() TomlConfigInterf {
 	containerFactory = CreateContainersFactory()
