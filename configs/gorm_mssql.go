@@ -8,11 +8,7 @@ type Mssql struct {
 	GeneralDB `toml:",inline" mapstructure:",squash"`
 }
 
-// Dsn sqlserver://user:password@localhost:1433?gorm=dbname
-func (m *Mssql) Dsn(isRead bool) string {
-	if isRead {
-		return "sqlserver://" + m.Read.User + ":" + m.Read.Pass + "@" + m.Read.Path + ":" + m.Read.Port + "?gorm=" + m.Read.DB + "&encrypt=disable"
-	}
-
-	return "sqlserver://" + m.Write.User + ":" + m.Write.Pass + "@" + m.Write.Path + ":" + m.Write.Port + "?gorm=" + m.Write.DB + "&encrypt=disable"
+// Dsn sqlserver://user:password@localhost:1433?gormDB=dbname
+func (m *Mssql) Dsn() string {
+	return "sqlserver://" + m.User + ":" + m.Pass + "@" + m.Path + ":" + m.Port + "?gormDB=" + m.DB + "&encrypt=disable"
 }

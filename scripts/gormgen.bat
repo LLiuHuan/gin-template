@@ -3,7 +3,7 @@ chcp 65001
 echo.
 echo Regenerating file
 echo.
-go run -v .\cmd\mysqlmd\main.go  -addr %1 -user %2 -pass %3 -name %4 -tables %5
+go run -v .\cmd\gormmd\main.go -driver %1 -host %2 -port %3 -user %4 -pass %5 -db %6 -tables %7
 if %errorlevel% == 1 (
 echo.
 echo failed!!!

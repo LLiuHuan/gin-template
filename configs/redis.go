@@ -12,7 +12,7 @@ type Redis struct {
 	Addr         string   `toml:"addr"`         // Addr Simple 实例配置地址
 	Addrs        []string `toml:"addrs"`        // Addrs Cluster,Failover实例配置地址
 	Pass         string   `toml:"pass"`         // Pass 密码
-	DB           int      `toml:"db"`           // DB，默认为0, 一般应用不推荐使用DB分片
+	DB           int      `toml:"gormDB"`       // DB，默认为0, 一般应用不推荐使用DB分片
 	MaxRetries   int      `toml:"maxRetries"`   // MaxRetries 网络相关的错误最大重试次数 默认8次
 	PoolSize     int      `toml:"poolSize"`     // PoolSize 集群内每个节点的最大连接池限制 默认每个CPU10个连接
 	MinIdleConns int      `toml:"minIdleConns"` // MinIdleConns 最小空闲连接数

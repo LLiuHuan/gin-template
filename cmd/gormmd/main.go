@@ -12,32 +12,36 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LLiuHuan/gin-template/cmd/gormmd/pkg"
+	"github.com/LLiuHuan/gin-template/pkg/gormDB"
 
 	"gorm.io/gorm"
 )
 
 // TODO: 支持多个数据库
 
+// tableInfo 表基础信息
 type tableInfo struct {
-	Name    string         `db:"table_name"`    // name
-	Comment sql.NullString `db:"table_comment"` // comment
+	Name    string         `gorm:"table_name"`    // 表名
+	Comment sql.NullString `gorm:"table_comment"` // 表描述
 }
 
+// tableColumn 表字段信息
 type tableColumn struct {
-	OrdinalPosition uint16         `db:"ORDINAL_POSITION"` // position
-	ColumnName      string         `db:"COLUMN_NAME"`      // name
-	ColumnType      string         `db:"COLUMN_TYPE"`      // column_type
-	DataType        string         `db:"DATA_TYPE"`        // data_type
-	ColumnKey       sql.NullString `db:"COLUMN_KEY"`       // key
-	IsNullable      string         `db:"IS_NULLABLE"`      // nullable
-	Extra           sql.NullString `db:"EXTRA"`            // extra
-	ColumnComment   sql.NullString `db:"COLUMN_COMMENT"`   // comment
-	ColumnDefault   sql.NullString `db:"COLUMN_DEFAULT"`   // default value
+	OrdinalPosition uint16         `gorm:"ORDINAL_POSITION"` // 列在表中的位置（从1开始）, 表示该列是表中第几列
+	ColumnName      string         `gorm:"COLUMN_NAME"`      // 列的名称
+	ColumnType      string         `gorm:"COLUMN_TYPE"`      // 列的完整数据类型定义，包括长度、是否为 UNSIGNED、是否为 ZEROFILL 等信息, 例如 varchar(255) int(11) unsigned
+	DataType        string         `gorm:"DATA_TYPE"`        // 列的数据类型（不带长度）。常见的数据类型包括 int、varchar、date、text 等
+	ColumnKey       sql.NullString `gorm:"COLUMN_KEY"`       // 列在表中的索引类型。可能的值包括： PRI: 主键。 UNI: 唯一索引。 MUL: 可以重复的非唯一索引（普通索引）。
+	IsNullable      string         `gorm:"IS_NULLABLE"`      // 该列是否允许存储 NULL 值。值为 YES 或 NO
+	Extra           sql.NullString `gorm:"EXTRA"`            // 列的额外信息，如自动递增（auto_increment）或其他特殊属性。
+	ColumnComment   sql.NullString `gorm:"COLUMN_COMMENT"`   // 列的注释，可以由用户通过 COMMENT 子句定义。
+	ColumnDefault   sql.NullString `gorm:"COLUMN_DEFAULT"`   // 列的默认值。可以是 NULL 或其他常量。如果列没有设置默认值，这里将显示 NULL。
 }
+
+type dataTypeMapping func(detailType string) (finalType string)
 
 var (
-	dbMode    string
+	dbDriver  string
 	dbHost    string
 	dbPort    string
 	dbUser    string
@@ -47,48 +51,43 @@ var (
 )
 
 func init() {
-	mode := flag.String("mode", "mysql", "请输入数据库类型，例如：mysql\n")
-	host := flag.String("host", "", "请输入 db IP，例如：127.0.0.1\n")
-	port := flag.String("port", "", "请输入 db 端口，例如：3306\n")
-	user := flag.String("user", "", "请输入 db 用户名\n")
-	pass := flag.String("pass", "", "请输入 db 密码\n")
-	name := flag.String("name", "", "请输入 db 名称\n")
-	table := flag.String("tables", "*", "请输入 table 名称，默认为“*”，多个可用“,”分割\n")
+	flag.StringVar(&dbDriver, "driver", "mysql", "请输入数据库类型，例如：mysql\n")
+	flag.StringVar(&dbHost, "host", "", "请输入 gorm IP/Path，例如：127.0.0.1\n")
+	flag.StringVar(&dbPort, "port", "", "请输入 gorm 端口，例如：3306\n")
+	flag.StringVar(&dbUser, "user", "", "请输入 gorm 数据库用户名\n")
+	flag.StringVar(&dbPass, "pass", "", "请输入 gorm 数据库密码，例如：123456\n")
+	flag.StringVar(&dbName, "db", "", "请输入 gorm 数据库名称\n")
+	flag.StringVar(&genTables, "tables", "*", "请输入要生成的表名，默认为“*”，多个可用“,”分割\n")
 
-	flag.Parse()
-
-	dbMode = *mode
-	dbHost = *host
-	dbPort = *port
-	dbUser = *user
-	dbPass = *pass
-	dbName = strings.ToLower(*name)
-	genTables = strings.ToLower(*table)
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+	dbName = strings.ToLower(dbName)
+	genTables = strings.ToLower(genTables)
 }
 
 func main() {
-	fmt.Println(dbMode, dbHost, dbPort, dbUser, dbPass, dbName)
 	// 初始化 DB
-	db, err := pkg.NewDB(dbMode, dbUser, dbPass, dbHost, dbPort, dbName)
+	db, err := gormDB.NewDB(dbDriver, dbUser, dbPass, dbHost, dbPort, dbName)
 	if err != nil {
-		log.Fatal("new db err", err)
+		log.Fatal("new gormDB err", err)
 	}
 
 	defer func() {
 		if err := db.DBClose(); err != nil {
-			log.Println("db close err", err)
+			log.Println("gormDB close err", err)
 		}
 	}()
 
 	tables, err := queryTables(db.GetDB(), dbName, genTables)
 	if err != nil {
-		log.Println("query tables of gorm err", err)
+		log.Println("query tables of gormDB err", err)
 		return
 	}
 
 	for _, table := range tables {
 
-		filepath := "./internal/repository/gorm/" + table.Name
+		filepath := "./internal/repository/gormDB/" + table.Name
 		_ = os.Mkdir(filepath, 0766)
 		fmt.Println("create dir : ", filepath)
 
@@ -140,7 +139,7 @@ func main() {
 			)
 
 			if textType(info.DataType) == "time.Time" {
-				modelContent += fmt.Sprintf("%s %s `%s` // %s\n", capitalize(info.ColumnName), textType(info.DataType), "gorm:\"time\"", info.ColumnComment.String)
+				modelContent += fmt.Sprintf("%s %s `%s` // %s\n", capitalize(info.ColumnName), textType(info.DataType), "gormDB:\"time\"", info.ColumnComment.String)
 			} else {
 				modelContent += fmt.Sprintf("%s %s // %s\n", capitalize(info.ColumnName), textType(info.DataType), info.ColumnComment.String)
 			}
@@ -162,7 +161,6 @@ func queryTables(db *gorm.DB, dbName string, tableName string) ([]tableInfo, err
 	var tableCollect []tableInfo
 	var tableArray []string
 	var commentArray []sql.NullString
-
 	sqlTables := fmt.Sprintf("SELECT `table_name`,`table_comment` FROM `information_schema`.`tables` WHERE `table_schema`= '%s'", dbName)
 	rows, err := db.Raw(sqlTables).Rows()
 	if err != nil {
@@ -260,6 +258,7 @@ func getTargetIndexMap(tableNameArr []string, item string) map[int]int {
 	return indexMap
 }
 
+// capitalize
 func capitalize(s string) string {
 	var upperStr string
 	chars := strings.Split(s, "_")
@@ -280,31 +279,48 @@ func capitalize(s string) string {
 }
 
 func textType(s string) string {
-	var databaseTypeToGoType = map[string]string{
-		"tinyint":    "int32",
-		"smallint":   "int32",
-		"mediumint":  "int32",
-		"int":        "int",
-		"integer":    "int64",
-		"bigint":     "int64",
-		"float":      "float64",
-		"double":     "float64",
-		"decimal":    "float64",
-		"date":       "string",
-		"time":       "string",
-		"year":       "string",
-		"datetime":   "time.Time",
-		"timestamp":  "time.Time",
-		"char":       "string",
-		"varchar":    "string",
-		"tinyblob":   "string",
-		"tinytext":   "string",
-		"blob":       "string",
-		"text":       "string",
-		"mediumblob": "string",
-		"mediumtext": "string",
-		"longblob":   "string",
-		"longtext":   "string",
+	var databaseTypeToGoType = map[string]dataTypeMapping{
+		"numeric":    func(string) string { return "int32" },
+		"integer":    func(string) string { return "int32" },
+		"int":        func(string) string { return "int32" },
+		"smallint":   func(string) string { return "int32" },
+		"mediumint":  func(string) string { return "int32" },
+		"bigint":     func(string) string { return "int64" },
+		"float":      func(string) string { return "float32" },
+		"real":       func(string) string { return "float64" },
+		"double":     func(string) string { return "float64" },
+		"decimal":    func(string) string { return "float64" },
+		"char":       func(string) string { return "string" },
+		"varchar":    func(string) string { return "string" },
+		"tinytext":   func(string) string { return "string" },
+		"mediumtext": func(string) string { return "string" },
+		"longtext":   func(string) string { return "string" },
+		"binary":     func(string) string { return "[]byte" },
+		"varbinary":  func(string) string { return "[]byte" },
+		"tinyblob":   func(string) string { return "[]byte" },
+		"blob":       func(string) string { return "[]byte" },
+		"mediumblob": func(string) string { return "[]byte" },
+		"longblob":   func(string) string { return "[]byte" },
+		"text":       func(string) string { return "string" },
+		"json":       func(string) string { return "string" },
+		"enum":       func(string) string { return "string" },
+		"time":       func(string) string { return "time.Time" },
+		"date":       func(string) string { return "time.Time" },
+		"datetime":   func(string) string { return "time.Time" },
+		"timestamp":  func(string) string { return "time.Time" },
+		"year":       func(string) string { return "int32" },
+		"bit":        func(string) string { return "[]uint8" },
+		"boolean":    func(string) string { return "bool" },
+		"tinyint": func(detailType string) string {
+			if strings.HasPrefix(strings.TrimSpace(detailType), "tinyint(1)") {
+				return "bool"
+			}
+			return "int32"
+		},
 	}
-	return databaseTypeToGoType[s]
+
+	if convert, ok := databaseTypeToGoType[strings.ToLower(s)]; ok {
+		return convert(s)
+	}
+	return "string"
 }

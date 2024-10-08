@@ -9,7 +9,7 @@ fi
 }
 
 printf "\nRegenerating file\n\n"
-time go run -v ./cmd/database/main.go  -host $1 -port $2 -user $3 -pass $4 -name $5 -tables $6
+time go run -v ./cmd/gormmd/main.go -driver ${1:-mysql} -host $2 -port $3 -user $4 -pass $5 -db $6 -tables ${7:-"*"}
 shellExit $?
 
 printf "\ncreate curd code : \n"

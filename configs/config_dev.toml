@@ -1,57 +1,17 @@
-[database]
-mode = 'mysql'
-
-[database.mysql]
-isopenreaddb = 1
-
-[database.mysql.base]
-connmaxlifetime = 60
-host = '127.0.0.1'
-maxidleconn = 60
-maxopenconn = 1
-name = 'gin-template'
-pass = 'root'
-port = 3306
-user = 'root'
-
-[database.mysql.read]
-database = 'gin-template'
-host = '127.0.0.1'
-name = 'gin-template'
-pass = 'root'
-port = 3306
-user = 'root'
-
-[database.mysql.write]
-database = 'gin-template'
-host = '127.0.0.1'
-name = 'gin-template'
-pass = 'root'
-port = 3306
-user = 'root'
-
-[database.postgresql]
-isopenreaddb = 1
-
-[database.postgresql.base]
-connmaxlifetime = 60
-maxidleconn = 60
-maxopenconn = 1
-
-[database.postgresql.read]
-database = 'postgres'
-host = '127.0.0.1'
-pass = 'qwer1234'
-port = 5432
-user = 'postgres'
-
-[database.postgresql.write]
-database = 'postgres'
-host = '127.0.0.1'
-pass = 'qwer1234'
-port = 5432
-user = 'postgres'
-
+[mysql]
+    [default]
+        prefix = ''
+        path = '127.0.0.1'
+        port = '3306'
+        user = 'root'
+        pass = 'root'
+        db = 'gin-template'
+        config = 'charset=utf8mb4&parseTime=True&loc=Local'
+        engine = 'InnoDB'
+        singular = false
+        logMode = 'error'
+        maxIdleConns = 10
+        maxOpenConns = 100
 [hash-ids]
 alphabet = 'FxnXM1kBN6cuhsAvjW3Co7l2RePyY8DwaU04Tzt9fHQrqSVKdpimLGIJOgb5ZE'
 

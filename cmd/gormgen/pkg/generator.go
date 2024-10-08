@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/LLiuHuan/gin-template/pkg/gorm"
+	"github.com/LLiuHuan/gin-template/pkg/gormDB"
 )
 
 // fieldConfig
@@ -65,7 +65,7 @@ func NewGenerator(outputFile string) *Generator {
 // ParserAST 通过go文件解析
 func (g *Generator) ParserAST(p *Parser, structs []string) (ret *Generator) {
 	for _, v := range structs {
-		g.buf[gorm.ToDBName(v)] = new(bytes.Buffer)
+		g.buf[gormDB.ToDBName(v)] = new(bytes.Buffer)
 	}
 	g.structConfigs = p.Parse()
 	g.config.PkgName = p.pkg.Name
@@ -94,10 +94,10 @@ func (g *Generator) Generate() *Generator {
 	}
 
 	for _, v := range g.structConfigs {
-		if _, ok := g.buf[gorm.ToDBName(v.StructName)]; !ok {
+		if _, ok := g.buf[gormDB.ToDBName(v.StructName)]; !ok {
 			continue
 		}
-		if err := outputTemplate.Execute(g.buf[gorm.ToDBName(v.StructName)], v); err != nil {
+		if err := outputTemplate.Execute(g.buf[gormDB.ToDBName(v.StructName)], v); err != nil {
 			panic(err)
 		}
 	}

@@ -19,8 +19,8 @@ var (
 )
 
 func init() {
-	flagStructs := flag.String("structs", "", "[Required] The name of schema structs to generate structs for, comma seperated\n")
-	flagInput := flag.String("input", "", "[Required] The name of the input file dir\n")
+	flagStructs := flag.String("structs", "", "[必需] 要为其生成结构的模式结构的名称，以逗号分隔\n")
+	flagInput := flag.String("input", "", "[必填] 输入文件的名称 dir\n")
 	flag.Parse()
 
 	if *flagStructs == "" || *flagInput == "" {
@@ -35,6 +35,7 @@ func init() {
 func main() {
 	gen := pkg.NewGenerator(input)
 	p := pkg.NewParser(input)
+	//fmt.Println(gen, p, structs)
 	if err := gen.ParserAST(p, structs).Generate().Format().Flush(); err != nil {
 		log.Fatalln(err)
 	}

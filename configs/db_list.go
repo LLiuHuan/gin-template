@@ -5,22 +5,17 @@
 package configs
 
 import (
-	"gorm.io/gorm/logger"
 	"strings"
+
+	"gorm.io/gorm/logger"
 )
 
 type DsnProvider interface {
-	Dsn(isRead bool) string
+	Dsn() string
 }
 
 // GeneralDB 通用数据库配置
 type GeneralDB struct {
-	IsOpenReadDB bool            `mapstructure:"isOpenReadDB" json:"isOpenReadDB" toml:"isOpenReadDB"` // 是否开启读写分离，如果不开启的话就默认忽略Read库的配置
-	Read         GeneralDBConfig `mapstructure:"read" json:"read" toml:"read"`
-	Write        GeneralDBConfig `mapstructure:"write" json:"write" toml:"write"`
-}
-
-type GeneralDBConfig struct {
 	Prefix       string `mapstructure:"prefix" json:"prefix" toml:"prefix"`                   // 数据库前缀
 	Path         string `mapstructure:"path" json:"path" toml:"path"`                         // path / host
 	Port         string `mapstructure:"port" json:"port" toml:"port"`                         // 数据库端口
@@ -37,7 +32,7 @@ type GeneralDBConfig struct {
 	LogZap bool `mapstructure:"logZap" json:"logZap" yaml:"logZap"`
 }
 
-func (c GeneralDBConfig) LogLevel() logger.LogLevel {
+func (c GeneralDB) LogLevel() logger.LogLevel {
 	switch strings.ToLower(c.LogMode) {
 	case "silent", "Silent":
 		return logger.Silent

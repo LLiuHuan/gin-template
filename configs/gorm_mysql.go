@@ -9,9 +9,6 @@ type Mysql struct {
 }
 
 // Dsn user:pass@tcp(host:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local
-func (m *Mysql) Dsn(isRead bool) string {
-	if isRead {
-		return m.Read.User + ":" + m.Read.Pass + "@tcp(" + m.Read.Path + ":" + m.Read.Port + ")/" + m.Read.DB + "?" + m.Read.Config
-	}
-	return m.Write.User + ":" + m.Write.Pass + "@tcp(" + m.Write.Path + ":" + m.Write.Port + ")/" + m.Write.DB + "?" + m.Write.Config
+func (m *Mysql) Dsn() string {
+	return m.User + ":" + m.Pass + "@tcp(" + m.Path + ":" + m.Port + ")/" + m.DB + "?" + m.Config
 }

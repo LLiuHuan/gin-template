@@ -10,10 +10,7 @@ type Sqlite struct {
 	GeneralDB `toml:",inline" mapstructure:",squash"`
 }
 
-// Dsn /path/to/sqlite.db
-func (s *Sqlite) Dsn(isRead bool) string {
-	if isRead {
-		return filepath.Join(s.Read.Pass, s.Read.DB+".db")
-	}
-	return filepath.Join(s.Write.Pass, s.Write.DB+".db")
+// Dsn /path/to/sqlite.gormDB
+func (s *Sqlite) Dsn() string {
+	return filepath.Join(s.Pass, s.DB+".db")
 }

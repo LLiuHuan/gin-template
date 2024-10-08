@@ -81,7 +81,6 @@ func main() {
 		if raw, err = format.Source(raw); err != nil {
 			return errors.Wrapf(err, "format file %s err", path)
 		}
-
 		file, err := parser.ParseFile(token.NewFileSet(), "", raw, 0)
 		if err != nil {
 			return errors.Wrapf(err, "parse file %s err", path)

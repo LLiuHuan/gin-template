@@ -27,7 +27,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/LLiuHuan/gin-template/internal/repository/gorm"
+	"github.com/LLiuHuan/gin-template/internal/repository/gormDB"
 
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -41,7 +41,7 @@ func NewQueryBuilder() *{{.QueryBuilderName}} {
 	return new({{.QueryBuilderName}})
 }
 
-func (t *{{.StructName}}) Create(db *gorm.DB) (id int, err error) {
+func (t *{{.StructName}}) Create(db *gorm.DB) (id int32, err error) {
 	if err = db.Create(t).Error; err != nil {
 		return 0, errors.Wrap(err, "create err")
 	}
@@ -52,7 +52,7 @@ type {{.QueryBuilderName}} struct {
 	order []string
 	where []struct {
 		prefix string
-		value  interface{}
+		value  any
 	}
 	limit  int
 	offset int
@@ -70,7 +70,7 @@ func (qb *{{.QueryBuilderName}}) buildQuery(db *gorm.DB) *gorm.DB {
 	return ret
 }
 
-func (qb *{{.QueryBuilderName}}) Updates(db *gorm.DB, m map[string]interface{}) (err error) {
+func (qb *{{.QueryBuilderName}}) Updates(db *gorm.DB, m map[string]any) (err error) {
 	db = db.Model(&{{.StructName}}{})
 
 	for _, where := range qb.where {
@@ -97,7 +97,7 @@ func (qb *{{.QueryBuilderName}}) Delete(db *gorm.DB) (err error) {
 func (qb *{{.QueryBuilderName}}) Count(db *gorm.DB) (int64, error) {
 	var c int64
 	res := qb.buildQuery(db).Model(&{{.StructName}}{}).Count(&c)
-	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+	if res.Error != nil && errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		c = 0
 	}
 	return c, res.Error
@@ -106,7 +106,7 @@ func (qb *{{.QueryBuilderName}}) Count(db *gorm.DB) (int64, error) {
 func (qb *{{.QueryBuilderName}}) First(db *gorm.DB) (*{{.StructName}}, error) {
 	ret := &{{.StructName}}{}
 	res := qb.buildQuery(db).First(ret)
-	if res.Error != nil && res.Error == gorm.ErrRecordNotFound {
+	if res.Error != nil && errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		ret = nil
 	}
 	return ret, res.Error
@@ -139,10 +139,10 @@ func (qb *{{.QueryBuilderName}}) Offset(offset int) *{{.QueryBuilderName}} {
 
 {{$queryBuilderName := .QueryBuilderName}}
 {{range .OptionFields}}
-func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}(p gorm.Predicate, value {{.FieldType}}) *{{$queryBuilderName}} {
+func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}(p gormDB.Predicate, value {{.FieldType}}) *{{$queryBuilderName}} {
 	 qb.where = append(qb.where, struct {
 		prefix string
-		value interface{}
+		value any
 	}{
 		fmt.Sprintf("%v %v ?", "{{.ColumnName}}", p),
 		value,
@@ -153,7 +153,7 @@ func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}(p g
 func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}In(value []{{.FieldType}}) *{{$queryBuilderName}} {
 	 qb.where = append(qb.where, struct {
 		prefix string
-		value interface{}
+		value any
 	}{
 		fmt.Sprintf("%v %v ?", "{{.ColumnName}}", "IN"),
 		value,
@@ -164,7 +164,7 @@ func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}In(v
 func (qb *{{$queryBuilderName}}) Where{{call $.Helpers.Titelize .FieldName}}NotIn(value []{{.FieldType}}) *{{$queryBuilderName}} {
 	 qb.where = append(qb.where, struct {
 		prefix string
-		value interface{}
+		value any
 	}{
 		fmt.Sprintf("%v %v ?", "{{.ColumnName}}", "NOT IN"),
 		value,

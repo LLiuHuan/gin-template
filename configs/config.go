@@ -45,15 +45,15 @@ type Config struct {
 	Project Project `mapstructure:"project" json:"project" yaml:"project" toml:"project"` // 项目信息
 	Notify  Notify  `mapstructure:"notify" json:"notify" yaml:"notify" toml:"notify"`     // 通知配置
 	Redis   Redis   `mapstructure:"redis" json:"redis" yaml:"redis" toml:"redis"`         // redis配置
-	// gorm
-	Mysql   Mysql           `mapstructure:"mysql" json:"mysql" yaml:"mysql" toml:"mysql"`
-	Mssql   Mssql           `mapstructure:"mssql" json:"mssql" yaml:"mssql" toml:"mssql"`
-	Pgsql   Pgsql           `mapstructure:"pgsql" json:"pgsql" yaml:"pgsql" toml:"pgsql"`
-	Oracle  Oracle          `mapstructure:"oracle" json:"oracle" yaml:"oracle" toml:"oracle"`
-	Sqlite  Sqlite          `mapstructure:"sqlite" json:"sqlite" yaml:"sqlite" toml:"sqlite"`
-	DBList  []SpecializedDB `mapstructure:"dbList" json:"dbList" yaml:"dbList" toml:"dbList"`
-	HashIds HashIds         `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"` // hashIds配置
-	Captcha Captcha         `mapstructure:"captcha" json:"captcha" yaml:"captcha" toml:"captcha"`    // 验证码配置
+	// gormDB
+	Mysql   map[string]*Mysql  `mapstructure:"mysql" json:"mysql" yaml:"mysql" toml:"mysql"`
+	Mssql   map[string]*Mssql  `mapstructure:"mssql" json:"mssql" yaml:"mssql" toml:"mssql"`
+	Pgsql   map[string]*Pgsql  `mapstructure:"pgsql" json:"pgsql" yaml:"pgsql" toml:"pgsql"`
+	Oracle  map[string]*Oracle `mapstructure:"oracle" json:"oracle" yaml:"oracle" toml:"oracle"`
+	Sqlite  Sqlite             `mapstructure:"sqlite" json:"sqlite" yaml:"sqlite" toml:"sqlite"`
+	DBList  []SpecializedDB    `mapstructure:"dbList" json:"dbList" yaml:"dbList" toml:"dbList"`
+	HashIds HashIds            `mapstructure:"hash-ids" json:"hashIds" yaml:"hash-ids" toml:"hash-ids"` // hashIds配置
+	Captcha Captcha            `mapstructure:"captcha" json:"captcha" yaml:"captcha" toml:"captcha"`    // 验证码配置
 }
 
 var (
@@ -78,7 +78,7 @@ var (
 	uatConfigs []byte
 )
 
-// init 初始化Viper，解析配置文件
+// initialize 初始化Viper，解析配置文件
 func init() {
 	lastChangeTime = time.Now()
 	configContainer = CreateTomlFactory()
