@@ -23,8 +23,15 @@ fi
 mv gormgen $GOPATH/bin
 shellExit $?
 
-go generate ./...
-shellExit $?
+if [ ${7:-"*"} = "*" ];then
+    printf "\nGenerating code\n\n"
+    go generate ./...
+    shellExit $?
+else
+    printf "\nGenerating code\n\n"
+    go generate ./internal/repository/gormDB/${7:-"*"}
+    shellExit $?
+fi
 
 printf "\nFormatting code\n\n"
 time go run -v ./cmd/mfmt/main.go
