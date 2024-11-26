@@ -99,6 +99,7 @@ func WithStack(err error) Error {
 	if e, ok := err.(*item); ok {
 		return e
 	}
-
 	return &item{msg: err.Error(), stack: callers()}
 }
+
+func Is(err, target error) bool { return errors.Is(err, target) }

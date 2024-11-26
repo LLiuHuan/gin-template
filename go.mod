@@ -18,7 +18,6 @@ require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/godror/godror v0.44.6
-	github.com/gofrs/uuid/v5 v5.3.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/pkg/errors v0.9.1
@@ -27,6 +26,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors/wrapper/gin v0.0.0-20240515105523-1562b1715b35
 	github.com/shirou/gopsutil/v4 v4.24.6
+	github.com/shopspring/decimal v1.4.0
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/viper v1.19.0
 	github.com/sqids/sqids-go v0.4.1

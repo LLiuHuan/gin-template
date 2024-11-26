@@ -91,7 +91,6 @@ func DSN(driver, user, pass, host, port, db string) string {
 
 func Dialector(driver, user, pass, host, port, db string) (gorm.Dialector, error) {
 	dsn := DSN(driver, user, pass, host, port, db)
-	fmt.Println(dsn)
 	switch strings.ToLower(driver) {
 	case "mysql":
 		return mysql.Open(dsn), nil
