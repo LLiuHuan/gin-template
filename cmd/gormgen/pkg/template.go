@@ -29,6 +29,7 @@ import (
 
 	"github.com/LLiuHuan/gin-template/internal/repository/gormDB"
 
+	"github.com/shopspring/decimal"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -41,7 +42,7 @@ func NewQueryBuilder() *{{.QueryBuilderName}} {
 	return new({{.QueryBuilderName}})
 }
 
-func (t *{{.StructName}}) Create(db *gorm.DB) (id int32, err error) {
+func (t *{{.StructName}}) Create(db *gorm.DB) (id uint, err error) {
 	if err = db.Create(t).Error; err != nil {
 		return 0, errors.Wrap(err, "create err")
 	}

@@ -35,7 +35,6 @@ func init() {
 func main() {
 	gen := pkg.NewGenerator(input)
 	p := pkg.NewParser(input)
-	//fmt.Println(gen, p, structs)
 	if err := gen.ParserAST(p, structs).Generate().Format().Flush(); err != nil {
 		log.Fatalln(err)
 	}

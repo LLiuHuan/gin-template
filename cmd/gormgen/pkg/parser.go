@@ -86,7 +86,7 @@ func (p *Parser) parseTypes(file *ast.File) (ret []structConfig) {
 					optionField.FieldType = t.String()
 				} else {
 					if v.Tag != nil {
-						if strings.Contains(v.Tag.Value, "gormDB") && strings.Contains(v.Tag.Value, "time") {
+						if strings.Contains(v.Tag.Value, "gorm") && strings.Contains(v.Tag.Value, "time") {
 							optionField.FieldType = "time.Time"
 						}
 					}

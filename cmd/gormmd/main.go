@@ -21,24 +21,23 @@ import (
 
 // tableInfo 表基础信息
 type tableInfo struct {
-	Name    string         `gorm:"table_name"`    // 表名
-	Comment sql.NullString `gorm:"table_comment"` // 表描述
+	Name    string         `gorm:"column:TABLE_NAME"`    // 表名
+	Comment sql.NullString `gorm:"column:TABLE_COMMENT"` // 表描述
 }
 
 // tableColumn 表字段信息
 type tableColumn struct {
-	OrdinalPosition uint16         `gorm:"ORDINAL_POSITION"` // 列在表中的位置（从1开始）, 表示该列是表中第几列
-	ColumnName      string         `gorm:"COLUMN_NAME"`      // 列的名称
-	ColumnType      string         `gorm:"COLUMN_TYPE"`      // 列的完整数据类型定义，包括长度、是否为 UNSIGNED、是否为 ZEROFILL 等信息, 例如 varchar(255) int(11) unsigned
-	DataType        string         `gorm:"DATA_TYPE"`        // 列的数据类型（不带长度）。常见的数据类型包括 int、varchar、date、text 等
-	ColumnKey       sql.NullString `gorm:"COLUMN_KEY"`       // 列在表中的索引类型。可能的值包括： PRI: 主键。 UNI: 唯一索引。 MUL: 可以重复的非唯一索引（普通索引）。
-	IsNullable      string         `gorm:"IS_NULLABLE"`      // 该列是否允许存储 NULL 值。值为 YES 或 NO
-	Extra           sql.NullString `gorm:"EXTRA"`            // 列的额外信息，如自动递增（auto_increment）或其他特殊属性。
-	ColumnComment   sql.NullString `gorm:"COLUMN_COMMENT"`   // 列的注释，可以由用户通过 COMMENT 子句定义。
-	ColumnDefault   sql.NullString `gorm:"COLUMN_DEFAULT"`   // 列的默认值。可以是 NULL 或其他常量。如果列没有设置默认值，这里将显示 NULL。
+	OrdinalPosition uint16         `gorm:"column:ORDINAL_POSITION"` // 列在表中的位置（从1开始）, 表示该列是表中第几列
+	ColumnName      string         `gorm:"column:COLUMN_NAME"`      // 列的名称
+	ColumnType      string         `gorm:"column:COLUMN_TYPE"`      // 列的完整数据类型定义，包括长度、是否为 UNSIGNED、是否为 ZEROFILL 等信息, 例如 varchar(255) int(11) unsigned
+	DataType        string         `gorm:"column:DATA_TYPE"`        // 列的数据类型（不带长度）。常见的数据类型包括 int、varchar、date、text 等
+	IsNullable      string         `gorm:"column:IS_NULLABLE"`      // 该列是否允许存储 NULL 值。值为 YES 或 NO
+	ColumnKey       sql.NullString `gorm:"column:COLUMN_KEY"`       // 列在表中的索引类型。可能的值包括： PRI: 主键。 UNI: 唯一索引。 MUL: 可以重复的非唯一索引（普通索引）。
+	ColumnDefault   sql.NullString `gorm:"column:COLUMN_DEFAULT"`   // 列的默认值。可以是 NULL 或其他常量。如果列没有设置默认值，这里将显示 NULL。
+	Extra           sql.NullString `gorm:"column:EXTRA"`            // 列的额外信息，如自动递增（auto_increment）或其他特殊属性。
+	Privileges      string         `gorm:"column:PRIVILEGES"`       // 列的权限信息，如 SELECT、INSERT、UPDATE、REFERENCES 等
+	ColumnComment   sql.NullString `gorm:"column:COLUMN_COMMENT"`   // 列的注释，可以由用户通过 COMMENT 子句定义。
 }
-
-type dataTypeMapping func(detailType string) (finalType string)
 
 var (
 	dbDriver  string
@@ -70,18 +69,18 @@ func main() {
 	// 初始化 DB
 	db, err := gormDB.NewDB(dbDriver, dbUser, dbPass, dbHost, dbPort, dbName)
 	if err != nil {
-		log.Fatal("new gormDB err", err)
+		log.Fatal("new gorm DB err", err)
 	}
 
 	defer func() {
 		if err := db.DBClose(); err != nil {
-			log.Println("gormDB close err", err)
+			log.Println("gorm DB close err", err)
 		}
 	}()
 
 	tables, err := queryTables(db.GetDB(), dbName, genTables)
 	if err != nil {
-		log.Println("query tables of gormDB err", err)
+		log.Println("query tables of gorm DB err", err)
 		return
 	}
 
@@ -138,11 +137,41 @@ func main() {
 				info.ColumnDefault.String,
 			)
 
-			if textType(info.DataType) == "time.Time" {
-				modelContent += fmt.Sprintf("%s %s `%s` // %s\n", capitalize(info.ColumnName), textType(info.DataType), "gormDB:\"time\"", info.ColumnComment.String)
-			} else {
-				modelContent += fmt.Sprintf("%s %s // %s\n", capitalize(info.ColumnName), textType(info.DataType), info.ColumnComment.String)
+			columnJson := "`gorm:\""
+			if info.ColumnKey.String == "PRI" {
+				columnJson += "primaryKey;"
 			}
+			if info.Extra.String == "auto_increment" {
+				columnJson += "autoIncrement;"
+			}
+			columnJson += "column:" + info.ColumnName + ";type:" + info.ColumnType + ";"
+			if info.IsNullable == "NO" && info.ColumnDefault.Valid {
+				columnJson += "default:" + info.ColumnDefault.String + ";"
+			}
+			if info.IsNullable == "NO" {
+				columnJson += "NOT NULL;"
+			} else {
+				columnJson += "NULL;"
+			}
+			if info.ColumnComment.Valid {
+				columnJson += "comment:" + info.ColumnComment.String
+			}
+			columnJson += "\" json:\"" + info.ColumnName + "\"`"
+
+			// 代码注释
+			columnComment := ""
+			if info.ColumnComment.Valid {
+				columnComment = "// " + info.ColumnComment.String
+			}
+
+			// TODO:
+			modelContent += fmt.Sprintf(
+				"%s %s %s %s\n",
+				capitalize(info.ColumnName),
+				textType(info.DataType, info.ColumnType, info.IsNullable == "YES"),
+				columnJson,
+				columnComment,
+			)
 		}
 
 		mdFile.WriteString(tableContent)
@@ -157,108 +186,52 @@ func main() {
 
 }
 
+// queryTables 查询表信息
 func queryTables(db *gorm.DB, dbName string, tableName string) ([]tableInfo, error) {
-	var tableCollect []tableInfo
-	var tableArray []string
-	var commentArray []sql.NullString
-	sqlTables := fmt.Sprintf("SELECT `table_name`,`table_comment` FROM `information_schema`.`tables` WHERE `table_schema`= '%s'", dbName)
-	rows, err := db.Raw(sqlTables).Rows()
-	if err != nil {
-		return tableCollect, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var info tableInfo
-		err = rows.Scan(&info.Name, &info.Comment)
-		if err != nil {
-			fmt.Printf("execute query tables action error,had ignored, detail is [%v]\n", err.Error())
-			continue
-		}
-
-		tableCollect = append(tableCollect, info)
-		tableArray = append(tableArray, info.Name)
-		commentArray = append(commentArray, info.Comment)
+	var tables []tableInfo
+	tx := db.Raw("SELECT TABLE_NAME,TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ?", dbName).Scan(&tables)
+	if tx.Error != nil {
+		return tables, tx.Error
 	}
 
-	// filter tables when specified tables params
+	// 当指定表参数时过滤表
 	if tableName != "*" {
-		tableCollect = nil
+		tableCollect := make([]tableInfo, 0)
 		chooseTables := strings.Split(tableName, ",")
-		indexMap := make(map[int]int)
-		for _, item := range chooseTables {
-			subIndexMap := getTargetIndexMap(tableArray, item)
-			for k, v := range subIndexMap {
-				if _, ok := indexMap[k]; ok {
-					continue
+
+		for _, info := range tables {
+			for _, item := range chooseTables {
+				if info.Name == item {
+					tableCollect = append(tableCollect, info)
 				}
-				indexMap[k] = v
 			}
 		}
 
-		if len(indexMap) != 0 {
-			for _, v := range indexMap {
-				var info tableInfo
-				info.Name = tableArray[v]
-				info.Comment = commentArray[v]
-				tableCollect = append(tableCollect, info)
-			}
-		}
+		return tableCollect, nil
 	}
 
-	return tableCollect, err
+	return tables, nil
 }
 
+// queryTableColumn 查询表字段信息
 func queryTableColumn(db *gorm.DB, dbName string, tableName string) ([]tableColumn, error) {
 	// 定义承载列信息的切片
-	var columns []tableColumn
+	columns := make([]tableColumn, 0)
 
-	sqlTableColumn := fmt.Sprintf("SELECT `ORDINAL_POSITION`,`COLUMN_NAME`,`COLUMN_TYPE`,`DATA_TYPE`,`COLUMN_KEY`,`IS_NULLABLE`,`EXTRA`,`COLUMN_COMMENT`,`COLUMN_DEFAULT` FROM `information_schema`.`columns` WHERE `table_schema`= '%s' AND `table_name`= '%s' ORDER BY `ORDINAL_POSITION` ASC",
-		dbName, tableName)
-
-	rows, err := db.Raw(sqlTableColumn).Rows()
-	if err != nil {
-		fmt.Printf("execute query table column action error, detail is [%v]\n", err.Error())
-		return columns, err
+	tx := db.Raw(`
+		SELECT 
+		ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,DATA_TYPE,IS_NULLABLE,COLUMN_KEY,COLUMN_DEFAULT,EXTRA,PRIVILEGES,COLUMN_COMMENT 
+		FROM information_schema.columns 
+		WHERE table_schema= ? AND table_name= ? ORDER BY ORDINAL_POSITION
+		`, dbName, tableName).Scan(&columns)
+	if tx.Error != nil {
+		fmt.Printf("execute query table column action error, detail is [%v]\n", tx.Error.Error())
+		return columns, tx.Error
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var column tableColumn
-		err = rows.Scan(
-			&column.OrdinalPosition,
-			&column.ColumnName,
-			&column.ColumnType,
-			&column.DataType,
-			&column.ColumnKey,
-			&column.IsNullable,
-			&column.Extra,
-			&column.ColumnComment,
-			&column.ColumnDefault)
-		if err != nil {
-			fmt.Printf("query table column scan error, detail is [%v]\n", err.Error())
-			return columns, err
-		}
-		columns = append(columns, column)
-	}
-
-	return columns, err
+	return columns, nil
 }
 
-func getTargetIndexMap(tableNameArr []string, item string) map[int]int {
-	indexMap := make(map[int]int)
-	for i := 0; i < len(tableNameArr); i++ {
-		if tableNameArr[i] == item {
-			if _, ok := indexMap[i]; ok {
-				continue
-			}
-			indexMap[i] = i
-		}
-	}
-	return indexMap
-}
-
-// capitalize
+// capitalize 首字母大写
 func capitalize(s string) string {
 	var upperStr string
 	chars := strings.Split(s, "_")
@@ -278,49 +251,46 @@ func capitalize(s string) string {
 	return upperStr
 }
 
-func textType(s string) string {
-	var databaseTypeToGoType = map[string]dataTypeMapping{
-		"numeric":    func(string) string { return "int32" },
-		"integer":    func(string) string { return "int32" },
-		"int":        func(string) string { return "int32" },
-		"smallint":   func(string) string { return "int32" },
-		"mediumint":  func(string) string { return "int32" },
-		"bigint":     func(string) string { return "int64" },
-		"float":      func(string) string { return "float32" },
-		"real":       func(string) string { return "float64" },
-		"double":     func(string) string { return "float64" },
-		"decimal":    func(string) string { return "float64" },
-		"char":       func(string) string { return "string" },
-		"varchar":    func(string) string { return "string" },
-		"tinytext":   func(string) string { return "string" },
-		"mediumtext": func(string) string { return "string" },
-		"longtext":   func(string) string { return "string" },
-		"binary":     func(string) string { return "[]byte" },
-		"varbinary":  func(string) string { return "[]byte" },
-		"tinyblob":   func(string) string { return "[]byte" },
-		"blob":       func(string) string { return "[]byte" },
-		"mediumblob": func(string) string { return "[]byte" },
-		"longblob":   func(string) string { return "[]byte" },
-		"text":       func(string) string { return "string" },
-		"json":       func(string) string { return "string" },
-		"enum":       func(string) string { return "string" },
-		"time":       func(string) string { return "time.Time" },
-		"date":       func(string) string { return "time.Time" },
-		"datetime":   func(string) string { return "time.Time" },
-		"timestamp":  func(string) string { return "time.Time" },
-		"year":       func(string) string { return "int32" },
-		"bit":        func(string) string { return "[]uint8" },
-		"boolean":    func(string) string { return "bool" },
-		"tinyint": func(detailType string) string {
-			if strings.HasPrefix(strings.TrimSpace(detailType), "tinyint(1)") {
-				return "bool"
-			}
-			return "int32"
-		},
+// parseAny2Ptr 解析数据类型,如果是可为空,则返回指针类型
+func parseAny2Ptr(isNull bool, dataType string) string {
+	if isNull {
+		return "*" + dataType
+	}
+	return dataType
+}
+
+// textType 获取数据库类型
+func textType(dataType, columnType string, isNull bool) string {
+	var unsigned string
+	if strings.Contains(columnType, "unsigned") {
+		unsigned = "u"
 	}
 
-	if convert, ok := databaseTypeToGoType[strings.ToLower(s)]; ok {
-		return convert(s)
+	switch dataType {
+	case "int", "integer", "mediumint", "year":
+		return parseAny2Ptr(isNull, unsigned+"int")
+	case "tinyint":
+		if strings.HasPrefix(strings.TrimSpace(columnType), "tinyint(1)") {
+			return "bool"
+		}
+		return parseAny2Ptr(isNull, unsigned+"int8")
+	case "smallint":
+		return parseAny2Ptr(isNull, unsigned+"int16")
+	case "bigint":
+		return parseAny2Ptr(isNull, unsigned+"int64")
+	case "double", "float", "real", "numeric":
+		if unsigned == "u" {
+			return "float64"
+		}
+		return "float32"
+	case "decimal":
+		//return "float64"
+		return "decimal.Decimal"
+	case "timestamp", "datetime", "date", "time":
+		return parseAny2Ptr(isNull, unsigned+"time.Time")
+	case "bool", "boolean":
+		return "bool"
+	default:
+		return parseAny2Ptr(isNull, "string")
 	}
-	return "string"
 }
